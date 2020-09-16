@@ -28,7 +28,7 @@ $color4:#763626;
 
 #mapa{
   height:calc(100vh - 60px);
-  z-index: -2;
+
 }
 
 #contenedor{
@@ -91,6 +91,10 @@ select{
   font-size: 1.2em;
   padding: 2px;
   border: 0.5px solid $color-gris;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: #fff;
 }
 input[type=text]{
   width: 100%;
