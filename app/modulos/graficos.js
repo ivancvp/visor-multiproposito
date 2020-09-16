@@ -14,7 +14,7 @@ class Barras extends Component {
   
       this.state = {
           series: [{
-            name: 'series-1',
+            name: 'Conteo',
             data: this.props.series
         }],
         options: {

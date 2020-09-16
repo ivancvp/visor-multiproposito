@@ -26,18 +26,24 @@ import {defaults as defaultControls} from 'ol/control.js';
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 import geometria from '../json/bbox.json'
-import {Temas} from './temas.js'
+
+import Leyenda from './leyenda.js'
 
 import { getZip} from './csvtojson'
 
 import variables from './variables'
 
+import Load from './util'
 
 
 import {Barras,Dona} from '../modulos/graficos'
 import { jsPDF } from "jspdf";
 
 
+
+var loading=ReactDOM.render(<Load visible={true} />, document.getElementById('loader'));
+
+ReactDOM.render(<Leyenda  />, document.getElementById('leyenda'));
 
 var donita= [0,0,0];
 var barrita = [0,0,0];
@@ -95,7 +101,7 @@ var base = new TileLayer({
     ],
     view: new View({
       center: transform([-74.1083125,4.663437], 'EPSG:4326', 'EPSG:3857'),
-      zoom: 12
+      zoom: 15
     })
   });
 
@@ -109,13 +115,16 @@ const mz_source = new VectorTileSource({
 
 const mz_uso_viv = new VectorTileLayer({
   source: mz_source,
+  zIndex:3
 });
 
 const mz_uso_mix = new VectorTileLayer({
   source: mz_source,
+  zIndex:2
 });
 const mz_uso_res = new VectorTileLayer({
   source: mz_source,
+  zIndex:1
 });
 
 map.addLayer(mz_uso_res);
@@ -296,8 +305,68 @@ mz_uso_res.setStyle(function(feature) {
             })
           });
         });
+        
+    ReactDOM.unmountComponentAtNode(document.getElementById('loader'))
+    mz_source.on('tileloadend', function () {
+      var extent = map.getView().calculateExtent(map.getSize());
+  
+
+      var elementos = mz_source.getFeaturesInExtent(extent);
+      
+      elementos = getUniqueFeatures(elementos, 'cod_dane');
+    
+      
+      
+      const getIndex = (data,col) => {
+        var valor=data.row[col]
+        return getEstadistica(valor,col)
+        
+      }
+    
+      var est1 = [0, 0, 0, 0, 0];
+      var est2 = [0, 0, 0, 0, 0];
+      var est3 = [0, 0, 0, 0, 0];
+    
+      if (elementos.length<5000) {
+    
+      elementos.forEach(function(feature) {
+         
+        var data = newdata[feature.get("cod_dane")];
+        
+       
+          var i1=getIndex(data,4)
+          var i2=getIndex(data,5)
+          var i3=getIndex(data,6)
+      
+          est1[i1] = est1[i1] + 1
+          est2[i2] = est2[i2] + 1
+          est3[i3] = est3[i3] + 1
+       
+    
+    
+        
+      });
+      }
+    
+      if (mz_uso_viv.getProperties().visible) {
+        barrita[0].setState({ series: [{ data: est1 }] })
+        donita[0].setState({ series: est1 })
+    
+      }
+      if (mz_uso_mix.getProperties().visible) {
+        barrita[1].setState({ series: [{ data: est2 }] })
+        donita[1].setState({ series: est2 })
+    
+      }
+      if (mz_uso_res.getProperties().visible) {
+        barrita[2].setState({ series: [{ data: est3 }] })
+        donita[2].setState({ series: est3 })
+      }
 
 
+
+
+    });
   }
 
 
@@ -314,7 +383,75 @@ mz_uso_res.setStyle(function(feature) {
        var ext = boundingExtent([[boundary[0][0],boundary[0][1]],[boundary[1][0],boundary[1][1]]]);
       ext = transformExtent(ext, 'EPSG:4326', 'EPSG:3857');
 
-      map.getView().fit(ext, map.getSize());
+    map.getView().fit(ext, map.getSize());
+     
+
+    mz_source.on('tileloadend', function () {
+      var extent = map.getView().calculateExtent(map.getSize());
+  
+
+      var elementos = mz_source.getFeaturesInExtent(extent);
+      
+      elementos = getUniqueFeatures(elementos, 'cod_dane');
+    
+      
+      
+      const getIndex = (data,col) => {
+        var valor=data.row[col]
+        return getEstadistica(valor,col)
+        
+      }
+    
+      var est1 = [0, 0, 0, 0, 0];
+      var est2 = [0, 0, 0, 0, 0];
+      var est3 = [0, 0, 0, 0, 0];
+    
+      if (elementos.length<5000) {
+    
+      elementos.forEach(function(feature) {
+         
+        var data = newdata[feature.get("cod_dane")];
+        
+       
+          var i1=getIndex(data,4)
+          var i2=getIndex(data,5)
+          var i3=getIndex(data,6)
+      
+          est1[i1] = est1[i1] + 1
+          est2[i2] = est2[i2] + 1
+          est3[i3] = est3[i3] + 1
+       
+    
+    
+        
+      });
+      }
+    
+      if (mz_uso_viv.getProperties().visible) {
+        barrita[0].setState({ series: [{ data: est1 }] })
+        donita[0].setState({ series: est1 })
+    
+      }
+      if (mz_uso_mix.getProperties().visible) {
+        barrita[1].setState({ series: [{ data: est2 }] })
+        donita[1].setState({ series: est2 })
+    
+      }
+      if (mz_uso_res.getProperties().visible) {
+        barrita[2].setState({ series: [{ data: est3 }] })
+        donita[2].setState({ series: est3 })
+      }
+
+
+
+
+    });
+
+
+
+
+
+
 
 });
 
@@ -327,20 +464,30 @@ map.on('singleclick', function(evt) {
   var coordinate = evt.coordinate;
 
   var mensaje = "";
-  map.forEachFeatureAtPixel(evt.pixel, function(feature,layer) {
-    
-    console.log(feature)
+  var id = "";
 
-    const id = layer.get('id')
-    
-    
-    mensaje=newdata[feature.get("cod_dane")];
-      
-      
+  var feature=map.forEachFeatureAtPixel(evt.pixel, function(feature,layer) { 
+    id = layer.get('id')
+    return feature;
     
   }, {
     hitTolerance: 2
   });
+
+
+  if (id == "mz_uso_viv") {
+    var info=newdata[feature.get("cod_dane")].row
+    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[1]+"</p><p>% : "+info[4]+"</p>"
+  }else if (id == "mz_uso_mix") {
+    var info=newdata[feature.get("cod_dane")].row
+    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[2]+"</p><p>% : "+info[5]+"</p>"
+  }else if (id == "mz_uso_res") {
+    var info=newdata[feature.get("cod_dane")].row
+    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[3]+"</p><p>% : "+info[6]+"</p>"
+  }
+
+
+
 
   if (mensaje!="") {
     content.innerHTML = '<p>'+mensaje+'</p>';
@@ -552,6 +699,8 @@ function onMoveEnd(evt) {
   evt.stopPropagation();
   evt.preventDefault();
 
+  console.log("hola")
+
   var map = evt.map;
   var extent = map.getView().calculateExtent(map.getSize());
   
@@ -568,24 +717,30 @@ function onMoveEnd(evt) {
     
   }
 
-  var est1 = [0, 0, 0, 0, 0, 0];
-  var est2 = [0, 0, 0, 0, 0, 0];
-  var est3 = [0, 0, 0, 0, 0, 0];
+  var est1 = [0, 0, 0, 0, 0];
+  var est2 = [0, 0, 0, 0, 0];
+  var est3 = [0, 0, 0, 0, 0];
+
+  if (elementos.length<5000) {
 
   elementos.forEach(function(feature) {
      
     var data = newdata[feature.get("cod_dane")];
+    
+   
+      var i1=getIndex(data,4)
+      var i2=getIndex(data,5)
+      var i3=getIndex(data,6)
+  
+      est1[i1] = est1[i1] + 1
+      est2[i2] = est2[i2] + 1
+      est3[i3] = est3[i3] + 1
+   
 
-    var i1=getIndex(data,4)
-    var i2=getIndex(data,5)
-    var i3=getIndex(data,6)
 
-    est1[i1] = est1[i1] + 1
-    est2[i2] = est2[i2] + 1
-    est3[i3] = est3[i3] + 1
     
   });
-
+  }
 
   if (mz_uso_viv.getProperties().visible) {
     barrita[0].setState({ series: [{ data: est1 }] })
@@ -621,23 +776,12 @@ function getUniqueFeatures(array, comparatorProperty) {
   return uniqueFeatures;
   }
 
-  //menu hide-show
-  /*
-  var tog = document.getElementById('tog');
-tog.addEventListener('change', e => {
-    
-  var ventana = document.getElementById("contenedor")
-  if (e.target.checked) {
-    ventana.style.gridTemplateColumns="0px 1fr"
-    map.updateSize()
+
+
+const mq = window.matchMedia("(max-width: 700px)");
+  
+  if (mq.matches) {
+    document.getElementById('ham').checked = false;
   } else {
-    ventana.style.gridTemplateColumns="300px 1fr"
-    map.updateSize()
+    document.getElementById('ham').checked = true;
   }
-
-}, false);
-  */
-
-document.querySelector('.toggle').addEventListener('click', e =>
-  document.querySelector('aside').classList.toggle('no-aside')
-)

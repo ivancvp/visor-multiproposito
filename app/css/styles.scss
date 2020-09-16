@@ -27,7 +27,8 @@ $color4:#763626;
 }
 
 #mapa{
-  height:calc(100vh - 60px)
+  height:calc(100vh - 60px);
+  z-index: -2;
 }
 
 #contenedor{
@@ -41,7 +42,7 @@ $color4:#763626;
 }
 .header{
   background-color: $color1;
-  background-image: url(/img/topography.svg);
+  background-image: url(/visor-multiproposito/img/topography.svg);
 
   grid-column-start: 1;
   grid-column-end: 3;
@@ -424,6 +425,7 @@ input[type="checkbox"]:checked+label::before {
   width: 300px;
   top:40px;
   left:-20px;
+  z-index: 100;
   list-style-type: none;
   -webkit-font-smoothing: antialiased;
   /* to stop flickering of text in safari */
@@ -442,4 +444,47 @@ input[type="checkbox"]:checked+label::before {
 #menuToggle #ham:checked ~ ul
 {
   transform: none;
+}
+
+#loader{
+  position:absolute;
+  left:50%;
+  width: 100px;
+  height: 100px;
+  z-index: 500;
+  top:45%;
+}
+
+#leyenda{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px;
+  border-radius: 3px;
+  background: #fff;
+
+  .item{
+    display:grid;
+    grid-template-columns: 10px 1fr;
+    row-gap: 5px;
+  }
+  p{
+    font-size: 0.9em;
+  }
+  #titulo{
+    font-size: 1.2em;
+    margin-bottom: 5px;
+  }
+  .descripcion{
+    margin:5px 0px;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  #leyenda{
+    width: 150px;
+  }
+  .header .titulo_visor{
+    font-size: 1.2em;
+  }
 }
