@@ -130,7 +130,7 @@ mz_uso_viv.set('id','mz_uso_viv')
 const mpio_source = new VectorTileSource({
   
   format: new MVT(),
-  url: `http://geoportal.dane.gov.co/vector-tiles/capa/V2018_MGN_MPIO_POLITICO/{z}/{x}/{-y}.pbf`,
+  url: `https://geoportal.dane.gov.co/vector-tiles/capa/V2018_MGN_MPIO_POLITICO/{z}/{x}/{-y}.pbf`,
 
 });
 
@@ -144,7 +144,7 @@ mpio.set('id', 'mpio')
 
 const depto_source = new VectorTileSource({
   format: new MVT(),
-  url: `http://geoportal.dane.gov.co/vector-tiles/capa/V2018_MGN_DPTO_POLITICO/{z}/{x}/{-y}.pbf`,
+  url: `https://geoportal.dane.gov.co/vector-tiles/capa/V2018_MGN_DPTO_POLITICO/{z}/{x}/{-y}.pbf`,
 });
 
 const depto = new VectorTileLayer({
