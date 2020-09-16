@@ -84,7 +84,14 @@ input[type=checkbox]:checked {
 }
 
 
-select,input[type=text]{
+select{
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2em;
+  padding: 2px;
+  border: 0.5px solid $color-gris;
+}
+input[type=text]{
   width: 100%;
   font-family: 'Roboto', sans-serif;
   font-size: 1.2em;
@@ -323,26 +330,13 @@ input[type="checkbox"]:checked+label::before {
   
 
   z-index: 1;
-  
-  -webkit-user-select: none;
-  user-select: none;
-}
 
-#menuToggle a
-{
-  text-decoration: none;
-  color: #232323;
-  
-  transition: color 0.3s ease;
-}
-
-#menuToggle a:hover
-{
-  color: tomato;
 }
 
 
-#menuToggle input
+
+
+#menuToggle #ham
 {
   display: block;
   width: 40px;
@@ -396,7 +390,7 @@ input[type="checkbox"]:checked+label::before {
  * Transform all the slices of hamburger
  * into a crossmark.
  */
-#menuToggle input:checked ~ .men
+#menuToggle #ham:checked ~ .men
 {
   opacity: 1;
   transform: rotate(45deg) translate(-2px, -1px);
@@ -406,7 +400,7 @@ input[type="checkbox"]:checked+label::before {
 /*
  * But let's hide the middle one.
  */
-#menuToggle input:checked ~ .men:nth-last-child(3)
+#menuToggle #ham:checked ~ .men:nth-last-child(3)
 {
   opacity: 0;
   transform: rotate(0deg) scale(0.2, 0.2);
@@ -415,7 +409,7 @@ input[type="checkbox"]:checked+label::before {
 /*
  * Ohyeah and the last one should go the other direction
  */
-#menuToggle input:checked ~ .men:nth-last-child(2)
+#menuToggle #ham:checked ~ .men:nth-last-child(2)
 {
   transform: rotate(-45deg) translate(0, -1px);
 }
@@ -430,7 +424,6 @@ input[type="checkbox"]:checked+label::before {
   width: 300px;
   top:40px;
   left:-20px;
-  background: #ededed;
   list-style-type: none;
   -webkit-font-smoothing: antialiased;
   /* to stop flickering of text in safari */
@@ -446,7 +439,7 @@ input[type="checkbox"]:checked+label::before {
 /*
  * And let's slide it in from the left
  */
-#menuToggle input:checked ~ ul
+#menuToggle #ham:checked ~ ul
 {
   transform: none;
 }
