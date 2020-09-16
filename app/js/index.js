@@ -36,6 +36,8 @@ import variables from './variables'
 import Load from './util'
 
 
+
+
 import {Barras,Dona} from '../modulos/graficos'
 import { jsPDF } from "jspdf";
 
