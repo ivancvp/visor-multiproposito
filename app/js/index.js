@@ -6,6 +6,7 @@ import './filtros'
 import 'ol/ol.css';
 import {Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
+import TileGrid from 'ol/tilegrid/TileGrid';
 import OSM from 'ol/source/OSM';
 import XYZ from 'ol/source/XYZ';
 import {transform} from 'ol/proj';
@@ -22,6 +23,10 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Cluster from 'ol/source/Cluster';
 import {Circle as CircleStyle, RegularShape, Text,Icon} from 'ol/style';
 import {defaults as defaultControls} from 'ol/control.js';
+
+import {get as getProjection} from 'ol/proj';
+
+
 
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
@@ -89,7 +94,10 @@ const images = importAll(require.context('../img/', false, /\.(png|jpg|svg)$/));
 
   var token="pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw" 
 var base = new TileLayer({
-  source: new OSM(),
+  source: new XYZ({
+    url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token='+token,
+    crossOrigin: "Anonymous"
+  })
 });
   const map = new Map({
     target: 'mapa',
@@ -107,9 +115,36 @@ var base = new TileLayer({
 
 
 
+
+var key="pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw"
+
+  
+
+var resolutions = [];
+for (var i = 0; i <= 8; ++i) {
+  resolutions.push(156543.03392804097 / Math.pow(2, i * 2));
+}
+// Calculation of tile urls for zoom levels 1, 3, 5, 7, 9, 11, 13, 15.
+function tileUrlFunction(tileCoord) {
+  return (
+    'https://api.mapbox.com/v4/ivan12345678.9t8jbmu0/{z}/{x}/{y}.vector.pbf?sku=101h6wrNEIHUF&access_token=' +
+    key
+  )
+    .replace('{z}', String(tileCoord[0] * 2 - 1))
+    .replace('{x}', String(tileCoord[1]))
+    .replace('{y}', String(tileCoord[2]))
+}
+
+
+
 const mz_source = new VectorTileSource({
   format: new MVT(),
-  url: `https://api.mapbox.com/v4/ivan12345678.9t8jbmu0/{z}/{x}/{y}.vector.pbf?sku=101h6wrNEIHUF&access_token=pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw`
+  tileGrid: new TileGrid({
+    extent: getProjection('EPSG:3857').getExtent(),
+    resolutions: resolutions,
+    tileSize: 512,
+  }),
+  tileUrlFunction: tileUrlFunction,
 });
 
 const mz_uso_viv = new VectorTileLayer({
