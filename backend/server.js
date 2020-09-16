@@ -27,6 +27,7 @@ app.get('/datos/:archivo', function (req, res) {
 
 });
 
+
 var DIST_DIR = path.join(__dirname, "../dist/");
 
 app.use("/",expressStaticGzip(DIST_DIR));
