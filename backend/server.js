@@ -32,5 +32,5 @@ var DIST_DIR = path.join(__dirname, "../dist/");
 app.use("/",expressStaticGzip(DIST_DIR));
 
 app.listen(3000, function () {
-  console.log('Example app listening on port 9000!');
+  console.log('Example app listening on port 3000!');
 });
