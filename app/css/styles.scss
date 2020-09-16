@@ -27,13 +27,12 @@ $color4:#763626;
 }
 
 #mapa{
-  height:100vh;
+  height:calc(100vh - 60px)
 }
 
 #contenedor{
   display:grid;
-  grid-template-columns: min-content 1fr;
-  height:100vh;
+  grid-template-columns: 1fr;
 
 }
 .ventana{
@@ -43,20 +42,25 @@ $color4:#763626;
 .header{
   background-color: $color1;
   background-image: url(/img/topography.svg);
-  
-  height:130px;
+
+  grid-column-start: 1;
+  grid-column-end: 3;
+  display: grid;
+  grid-template-columns: 80px min-content 1fr;
+  height:60px;
 
   .titulo_visor{
     color: #fff;
     font-size:  1.8em;
     font-weight: 500;
-    padding: 0px 10px 10px 10px;
+    align-self: center;
+    margin-left: 20px;
   }
 }
 .body{
   padding:10px;
   overflow-y: scroll;
-  height: calc(100vh - 170px)
+  height: calc(100vh - 60px)
 }
 #dane{
   width: 100px;
@@ -310,73 +314,139 @@ input[type="checkbox"]:checked+label::before {
 
 
 
-
-
-
-aside {
-  width:300px;
-  background-color: #ffff;
-  transition: width 1s;
-  height: 100vh;
-}
-
-.no-aside{
-  width:60px;
-  height: 100vh;
-  .ventana{
-    visibility: hidden;
-  }
-}
-
-
-.toggle {
-  width: 40px;
-  height: 40px;
+#menuToggle
+{
   display: block;
   position: relative;
+  top:20px;
+  left:20px;
+  
+
+  z-index: 1;
+  
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-.toggle i,
-.toggle i::after,
-.toggle i::before {
-  position: absolute;
+#menuToggle a
+{
+  text-decoration: none;
+  color: #232323;
+  
+  transition: color 0.3s ease;
+}
+
+#menuToggle a:hover
+{
+  color: tomato;
+}
+
+
+#menuToggle input
+{
+  display: block;
   width: 40px;
+  height: 32px;
+  position: absolute;
+  top: -7px;
+  left: -5px;
+  
+  cursor: pointer;
+  
+  opacity: 0; /* hide this */
+  z-index: 2; /* and place it over the hamburger */
+  
+  -webkit-touch-callout: none;
+}
+
+/*
+ * Just a quick hamburger
+ */
+#menuToggle .men
+{
+  display: block;
+  width: 33px;
   height: 4px;
-  border-radius: 4px;
-  transition: transform .15s;
-  background-color: $color4;
+  margin-bottom: 5px;
+  position: relative;
+  
+  background:#fff;
+  border-radius: 3px;
+  
+  z-index: 1;
+  
+  transform-origin: 4px 0px;
+  
+  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+              background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+              opacity 0.55s ease;
 }
 
-.toggle i {
-  top: 50%;
-  left: 18%;
-  display: block;
-  background:$color4;
+#menuToggle .men:first-child
+{
+  transform-origin: 0% 0%;
 }
 
-.toggle i::before {
-  top: -10px;
+#menuToggle .men:nth-last-child(2)
+{
+  transform-origin: 0% 100%;
 }
 
-.toggle i::after {
-  bottom: -10px;
+/* 
+ * Transform all the slices of hamburger
+ * into a crossmark.
+ */
+#menuToggle input:checked ~ .men
+{
+  opacity: 1;
+  transform: rotate(45deg) translate(-2px, -1px);
+  background: #fff;
 }
 
-.toggle i::after,
-.toggle i::before {
-  content: '';
-  display: block;
+/*
+ * But let's hide the middle one.
+ */
+#menuToggle input:checked ~ .men:nth-last-child(3)
+{
+  opacity: 0;
+  transform: rotate(0deg) scale(0.2, 0.2);
 }
 
-.toggle i::before {
-  transform: translate3d(-8px, 0, 0) rotate(-45deg) scale(0.7, 1);
+/*
+ * Ohyeah and the last one should go the other direction
+ */
+#menuToggle input:checked ~ .men:nth-last-child(2)
+{
+  transform: rotate(-45deg) translate(0, -1px);
 }
 
-.toggle i::after {
-  transform: translate3d(-8px, 0, 0) rotate(45deg) scale(0.7, 1);
+/*
+ * Make this absolute positioned
+ * at the top left of the screen
+ */
+#menu
+{
+  position: absolute;
+  width: 300px;
+  top:40px;
+  left:-20px;
+  background: #ededed;
+  list-style-type: none;
+  -webkit-font-smoothing: antialiased;
+  /* to stop flickering of text in safari */
+  
+  transform-origin: 0% 0%;
+  transform: translate(-100%, 0);
+  
+  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
 }
 
-.no-aside .toggle i::before,
-.no-aside .toggle i::after {
+
+
+/*
+ * And let's slide it in from the left
+ */
+#menuToggle input:checked ~ ul
+{
   transform: none;
 }

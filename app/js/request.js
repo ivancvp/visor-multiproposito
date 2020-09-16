@@ -1,10 +1,9 @@
 const axios = require('axios');
 
-//http://visor01.dane.gov.co/
 
 const destino = "https://nowsoft.app/visor-multiproposito/";
 
-//const destino = "http://localhost:9000/visor-vulnerabilidad/";
+//const destino = "http://localhost:9000/";
 
 
 function servidorPost(uri,datos){
