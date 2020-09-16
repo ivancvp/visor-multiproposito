@@ -93,8 +93,7 @@ select{
   border: 0.5px solid $color-gris;
   -webkit-appearance: none;
   -moz-appearance: none;
-  appearance: none;
-  background: #fff;
+
 }
 input[type=text]{
   width: 100%;
@@ -466,7 +465,7 @@ input[type="checkbox"]:checked+label::before {
   padding: 5px;
   border-radius: 3px;
   background: #fff;
-
+  z-index: 2;
   .item{
     display:grid;
     grid-template-columns: 10px 1fr;
@@ -489,6 +488,6 @@ input[type="checkbox"]:checked+label::before {
     width: 150px;
   }
   .header .titulo_visor{
-    font-size: 1.2em;
+    font-size: 1.3em;
   }
 }
