@@ -782,6 +782,24 @@ const mq = window.matchMedia("(max-width: 700px)");
   
   if (mq.matches) {
     document.getElementById('ham').checked = false;
+
+
+    var ham = document.getElementById('ham');
+ham.addEventListener('change', e => {
+  
+  if (ham.checked) {
+    document.getElementById('leyenda').style.visibility = "hidden";
+  } else {
+    document.getElementById('leyenda').style.visibility = "visible";
+    
+  }
+
+}
+
+, false);
+
+
   } else {
     document.getElementById('ham').checked = true;
   }
+
