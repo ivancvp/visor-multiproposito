@@ -694,12 +694,14 @@ const getEstadistica = (valor,columna) => {
 }
 
 
-
+var grafico=document.getElementById('grupo-graficos')
 function onMoveEnd(evt) {
   evt.stopPropagation();
   evt.preventDefault();
 
-  console.log("hola")
+  if (evt.map.getView().getZoom() > 14) {
+    
+  
 
   var map = evt.map;
   var extent = map.getView().calculateExtent(map.getSize());
@@ -722,7 +724,7 @@ function onMoveEnd(evt) {
   var est3 = [0, 0, 0, 0, 0];
 
   if (elementos.length<5000) {
-
+    grafico.style.height = "500px";
   elementos.forEach(function(feature) {
      
     var data = newdata[feature.get("cod_dane")];
@@ -756,7 +758,10 @@ function onMoveEnd(evt) {
     barrita[2].setState({ series: [{ data: est3 }] })
     donita[2].setState({ series: est3 })
   }
-
+  } else {
+    grafico.style.height = "0px";
+  }
+  
 }
 
 map.on('moveend', onMoveEnd);
