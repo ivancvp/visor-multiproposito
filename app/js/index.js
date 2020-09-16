@@ -168,8 +168,10 @@ const mz_uso_res = new VectorTileLayer({
 
 map.addLayer(mz_uso_res);
 mz_uso_res.set('id', 'mz_uso_res')
+mz_uso_res.setVisible(false)
 map.addLayer(mz_uso_mix);
 mz_uso_mix.set('id','mz_uso_mix')
+mz_uso_mix.setVisible(false)
 map.addLayer(mz_uso_viv);
 mz_uso_viv.set('id','mz_uso_viv')
 
@@ -738,7 +740,7 @@ function onMoveEnd(evt) {
   evt.stopPropagation();
   evt.preventDefault();
 
-  if (evt.map.getView().getZoom() > 14) {
+  if (evt.map.getView().getZoom() > 12) {
     
   
 
@@ -762,7 +764,7 @@ function onMoveEnd(evt) {
   var est2 = [0, 0, 0, 0, 0];
   var est3 = [0, 0, 0, 0, 0];
 
-  if (elementos.length<5000) {
+  if (elementos.length<10000) {
     grafico.style.height = "500px";
   elementos.forEach(function(feature) {
      
