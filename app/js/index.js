@@ -87,10 +87,7 @@ const images = importAll(require.context('../img/', false, /\.(png|jpg|svg)$/));
 
   var token="pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw" 
 var base = new TileLayer({
-  source: new XYZ({
-    url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token='+token,
-    crossOrigin: "Anonymous"
-  })
+  source: new OSM(),
 });
   const map = new Map({
     target: 'mapa',
