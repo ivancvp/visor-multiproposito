@@ -10,7 +10,7 @@ export function getZip(archivo) {
     var newdata=[]
 
      async function datos() {
-        const response = await servidor.getData('http://localhost:9000/datos/'+archivo);
+        const response = await servidor.getData('datos/'+archivo);
 
         return zip.loadAsync(response.data)
         .then(function(zip) {

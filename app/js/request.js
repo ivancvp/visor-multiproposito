@@ -2,7 +2,7 @@ const axios = require('axios');
 
 //http://visor01.dane.gov.co/
 
-const destino = "https://nowsoft.app/visor-vulnerabilidad/";
+const destino = "https://nowsoft.app/visor-multiproposito/";
 
 //const destino = "http://localhost:9000/visor-vulnerabilidad/";
 
@@ -32,7 +32,7 @@ function redireccionar(error){
 
 function getData(uri) {
     
-    return axios.get(uri,
+    return axios.get(destino+uri,
         
         {
             responseType: 'arraybuffer'
