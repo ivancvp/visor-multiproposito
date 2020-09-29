@@ -40,7 +40,7 @@ import variables from './variables'
 
 import Load from './util'
 
-
+import servidor from './request'
 
 
 import {Barras,Dona} from '../modulos/graficos'
@@ -92,7 +92,8 @@ const images = importAll(require.context('../img/', false, /\.(png|jpg|svg)$/));
     }
   });
 
-  var token="pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw" 
+var token = "pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw" 
+  
 var base = new TileLayer({
   source: new XYZ({
     url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token='+token,
@@ -108,7 +109,7 @@ var base = new TileLayer({
     ],
     view: new View({
       center: transform([-74.1083125,4.663437], 'EPSG:4326', 'EPSG:3857'),
-      zoom: 15
+      zoom: 14
     })
   });
 
@@ -126,6 +127,7 @@ for (var i = 0; i <= 8; ++i) {
 }
 // Calculation of tile urls for zoom levels 1, 3, 5, 7, 9, 11, 13, 15.
 function tileUrlFunction(tileCoord) {
+
   return (
     'https://api.mapbox.com/v4/ivan12345678.9t8jbmu0/{z}/{x}/{y}.vector.pbf?sku=101h6wrNEIHUF&access_token=' +
     key
@@ -136,11 +138,48 @@ function tileUrlFunction(tileCoord) {
 }
 
 
+/*
+function tileUrlFunction_sector(tileCoord) {
+  return (
+    'https://geoportal.dane.gov.co/vector-tiles/capa/V2018_MGN_SECTORES/{z}/{x}/{y}.pbf'
+  )
+    .replace('{z}', String(tileCoord[0] * 2 - 1))
+    .replace('{x}', String(tileCoord[1]))
+    .replace('{y}', String(Math.pow(2, (tileCoord[0] * 2 - 1)) - tileCoord[2] - 1))
+}
+*/
+function tileUrlFunction_sector(tileCoord) {
+
+  return (
+    servidor.getUrl()+'sector/{x}/{y}/{z}.pbf'
+  )
+    .replace('{z}', String(tileCoord[0] * 2 - 1))
+    .replace('{x}', String(tileCoord[1]))
+    .replace('{y}', String(tileCoord[2]))
+}
+function tileUrlFunction_mpio(tileCoord) {
+
+  return (
+    servidor.getUrl()+'mpio/{x}/{y}/{z}.pbf'
+  )
+    .replace('{z}', String(tileCoord[0] * 2 - 1))
+    .replace('{x}', String(tileCoord[1]))
+    .replace('{y}', String(tileCoord[2]))
+}
+function tileUrlFunction_depto(tileCoord) {
+
+  return (
+    servidor.getUrl()+'depto/{x}/{y}/{z}.pbf'
+  )
+    .replace('{z}', String(tileCoord[0] * 2 - 1))
+    .replace('{x}', String(tileCoord[1]))
+    .replace('{y}', String(tileCoord[2]))
+}
 
 const mz_source = new VectorTileSource({
   format: new MVT(),
   tileGrid: new TileGrid({
-    extent: getProjection('EPSG:3857').getExtent(),
+    extent: getProjection('EPSG:900913').getExtent(),
     resolutions: resolutions,
     tileSize: 512,
   }),
@@ -148,9 +187,15 @@ const mz_source = new VectorTileSource({
 });
 
 
-
-
-
+const sector_source = new VectorTileSource({
+  format: new MVT(),
+  tileGrid: new TileGrid({
+    extent: getProjection('EPSG:900913').getExtent(),
+    resolutions: resolutions,
+    tileSize: 512,
+  }),
+  tileUrlFunction: tileUrlFunction_sector,
+});
 
 const mz_uso_viv = new VectorTileLayer({
   source: mz_source,
@@ -166,6 +211,12 @@ const mz_uso_res = new VectorTileLayer({
   zIndex:1
 });
 
+const dif_catastro_censo = new VectorTileLayer({
+  source: mz_source,
+  zIndex:4
+});
+
+
 map.addLayer(mz_uso_res);
 mz_uso_res.set('id', 'mz_uso_res')
 mz_uso_res.setVisible(false)
@@ -174,35 +225,81 @@ mz_uso_mix.set('id','mz_uso_mix')
 mz_uso_mix.setVisible(false)
 map.addLayer(mz_uso_viv);
 mz_uso_viv.set('id','mz_uso_viv')
+mz_uso_viv.setVisible(false)
+
+map.addLayer(dif_catastro_censo);
+dif_catastro_censo.set('id','dif_catastro_censo')
+
 
 
 
 const mpio_source = new VectorTileSource({
-  
   format: new MVT(),
-  url: `https://geoportal.dane.gov.co/vector-tiles/capa/V2018_MGN_MPIO_POLITICO/{z}/{x}/{-y}.pbf`,
-
+  tileGrid: new TileGrid({
+    extent: getProjection('EPSG:900913').getExtent(),
+    resolutions: resolutions,
+    tileSize: 512,
+  }),
+  tileUrlFunction: tileUrlFunction_mpio,
 });
+
 
 const mpio = new VectorTileLayer({
   source: mpio_source,
+  zIndex:10
 });
 
 map.addLayer(mpio);
 mpio.set('id', 'mpio')
-
+mpio.setVisible(false)
 
 const depto_source = new VectorTileSource({
   format: new MVT(),
-  url: `https://geoportal.dane.gov.co/vector-tiles/capa/V2018_MGN_DPTO_POLITICO/{z}/{x}/{-y}.pbf`,
+  tileGrid: new TileGrid({
+    extent: getProjection('EPSG:900913').getExtent(),
+    resolutions: resolutions,
+    tileSize: 512,
+  }),
+  tileUrlFunction: tileUrlFunction_depto,
 });
 
 const depto = new VectorTileLayer({
   source: depto_source,
+  zIndex:15
 });
 
 map.addLayer(depto);
 depto.set('id', 'depto')
+depto.setVisible(false)
+
+
+////
+
+map.on("pointermove", function (evt) {
+  var hit = map.hasFeatureAtPixel(evt.pixel);
+  map.getTargetElement().style.cursor = (hit ? 'pointer' : '');
+});
+
+const sector_vivienda = new VectorTileLayer({
+  source: sector_source,
+});
+const sector_mixto = new VectorTileLayer({
+  source: sector_source,
+});
+const sector_residencial = new VectorTileLayer({
+  source: sector_source,
+});
+
+map.addLayer(sector_vivienda);
+sector_vivienda.set('id', 'sector_vivienda')
+sector_vivienda.setVisible(false)
+map.addLayer(sector_mixto);
+sector_mixto.set('id', 'sector_mixto')
+sector_mixto.setVisible(false)
+
+map.addLayer(sector_residencial);
+sector_residencial.set('id', 'sector_residencial')
+sector_residencial.setVisible(false)
 
 
 
@@ -225,6 +322,11 @@ mz_uso_mix.setStyle(function(feature) {
   
 });
 mz_uso_res.setStyle(function(feature) {
+  
+  emptyLayerStyle()
+  
+});
+dif_catastro_censo.setStyle(function(feature) {
   
   emptyLayerStyle()
   
@@ -257,15 +359,20 @@ mz_uso_res.setStyle(function(feature) {
 
 
 
-  var newdata=[]
-
+  var newdata_mz=[]
+  var newdata_sect = []
+  var newdata_mz_hot = []
+  
   async function getDatos(){
-    newdata = await getZip('manzana');
+    newdata_mz = await getZip('manzana');
+    newdata_sect = await getZip('sector');
+    newdata_mz_hot = await getZip('hot_spot');
     
     layerStyle();
 
-  }
-  getDatos()
+}
+  
+getDatos()
 
 
 
@@ -296,24 +403,117 @@ mz_uso_res.setStyle(function(feature) {
     return colores[Math.max(...filter)]
     
   }
+  const getColorHot = (valor,columna) => {
+
+    var array = []
+    var colores=[]
+    switch (columna){
+      case 4:
+        array= variables.hot_spot.rangos;
+        colores = variables.hot_spot.colores;
+        break;
+    }
+
+    var filter = array.map((e,i) => {
+      return e < valor?i:false;
+    })
   
+    return colores[Math.max(...filter)]
+    
+  }
 
   const iterador = (feature,columna) => {
     const key = feature.get('cod_dane');
 
     var color="#fff"
-    if(typeof newdata[key] !== "undefined")
+    if(typeof newdata_mz[key] !== "undefined")
     {
-      //console.log(newdata[key])
+      //console.log(newdata_mz[key])
       
-        color=getColor(parseFloat(newdata[key].row[columna]),columna)
+        color=getColor(parseFloat(newdata_mz[key].row[columna]),columna)
          
     }
     return color;
+}
+  
+  const iterador_sector = (feature,columna) => {
+    const key = feature.get('setr_ccnct');
+        
+    var color="#fff"
+    if(typeof newdata_sect[key] !== "undefined")
+    {
+      //console.log(newdata_mz[key])
+      
+        color=getColor(parseFloat(newdata_sect[key].row[columna]),columna)
+         
+    }
+    return color;
+}
+const iterador_hot_spot = (feature,columna) => {
+  const key = feature.get('cod_dane');
+  
+  var color="#fff"
+  if(typeof newdata_mz_hot[key] !== "undefined")
+  {
+    //console.log(newdata_mz[key])
+    
+      color=getColorHot(parseFloat(newdata_mz_hot[key].row[columna]),columna)
+       
   }
+  return color;
+}
 
   const layerStyle = () => {
-
+    dif_catastro_censo.setStyle(function(feature) {
+  
+      var color = iterador_hot_spot(feature,4);
+        
+        //console.log(feature)
+        
+        return new Style({
+          fill: new Fill({
+            color: color
+          })
+        });
+    });
+    
+    sector_vivienda.setStyle(function(feature) {
+  
+      var color = iterador_sector(feature,4);
+        
+        //console.log(feature)
+        
+        return new Style({
+          fill: new Fill({
+            color: color
+          })
+        });
+      });
+      sector_mixto.setStyle(function(feature) {
+  
+        var color = iterador_sector(feature,5);
+          
+          //console.log(feature)
+          
+          return new Style({
+            fill: new Fill({
+              color: color
+            })
+          });
+        });
+        sector_residencial.setStyle(function(feature) {
+  
+          var color = iterador_sector(feature,6);
+            
+            //console.log(feature)
+            
+            return new Style({
+              fill: new Fill({
+                color: color
+              })
+            });
+          });
+    
     mz_uso_viv.setStyle(function(feature) {
   
     var color = iterador(feature,4);
@@ -372,7 +572,7 @@ mz_uso_res.setStyle(function(feature) {
     
       elementos.forEach(function(feature) {
          
-        var data = newdata[feature.get("cod_dane")];
+        var data = newdata_mz[feature.get("cod_dane")];
         
        
           var i1=getIndex(data,4)
@@ -408,6 +608,8 @@ mz_uso_res.setStyle(function(feature) {
 
 
     });
+
+
   }
 
 
@@ -451,7 +653,7 @@ mz_uso_res.setStyle(function(feature) {
     
       elementos.forEach(function(feature) {
          
-        var data = newdata[feature.get("cod_dane")];
+        var data = newdata_mz[feature.get("cod_dane")];
         
        
           var i1=getIndex(data,4)
@@ -514,19 +716,43 @@ map.on('singleclick', function(evt) {
   }, {
     hitTolerance: 2
   });
-
+console.log(id)
 
   if (id == "mz_uso_viv") {
-    var info=newdata[feature.get("cod_dane")].row
+    var info=newdata_mz[feature.get("cod_dane")].row
     mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[1]+"</p><p>% : "+info[4]+"</p>"
   }else if (id == "mz_uso_mix") {
-    var info=newdata[feature.get("cod_dane")].row
+    var info=newdata_mz[feature.get("cod_dane")].row
     mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[2]+"</p><p>% : "+info[5]+"</p>"
   }else if (id == "mz_uso_res") {
-    var info=newdata[feature.get("cod_dane")].row
+    var info=newdata_mz[feature.get("cod_dane")].row
     mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[3]+"</p><p>% : "+info[6]+"</p>"
   }
+  else if (id == "dif_catastro_censo") {
+    var info=newdata_mz_hot[feature.get("cod_dane")].row
+    mensaje="<p>Cod DANE: "+info[0]+"</p><p>diferencia %: "+info[4]+"</p>"
+  }
+  else if (id == "sector_vivienda") {
+    var info=newdata_sect[feature.get("setr_ccnct")].row
+    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[1]+"</p><p>% : "+info[4]+"</p>"
+  }
+  else if (id == "sector_mixto") {
+    var info=newdata_sect[feature.get("setr_ccnct")].row
+    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[2]+"</p><p>% : "+info[5]+"</p>"
+  }
+  else if (id == "sector_residencial") {
+    var info=newdata_sect[feature.get("setr_ccnct")].row
+    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[3]+"</p><p>% : "+info[6]+"</p>"
+  }
+  else if (id == "mpio") {
+    var info=feature.get("nombre_mpio")
+    var info1=feature.get("nombre_depto")
 
+    mensaje="<p>Municipio: "+info+"</p>"+"<p>Depto: "+info1+"</p>"
+  }else if (id == "depto") {
+    var info=feature.get("nombre")
+    mensaje="<p>Depto: "+info+"</p>"
+  }
 
 
 
@@ -768,7 +994,7 @@ function onMoveEnd(evt) {
     grafico.style.height = "500px";
   elementos.forEach(function(feature) {
      
-    var data = newdata[feature.get("cod_dane")];
+    var data = newdata_mz[feature.get("cod_dane")];
     
    
       var i1=getIndex(data,4)
@@ -848,4 +1074,14 @@ ham.addEventListener('change', e => {
   } else {
     document.getElementById('ham').checked = true;
   }
+/*
+  var currZoom = map.getView().getZoom();
 
+  map.on('moveend', function(e) {
+    var newZoom = map.getView().getZoom();
+    if (currZoom != newZoom) {
+      console.log('zoom end, new zoom: ' + newZoom);
+      currZoom = newZoom;
+    }
+  });
+*/

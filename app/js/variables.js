@@ -20,8 +20,13 @@ export default {
         labels: ['<10%', '10-25%', '25-50%', '50-80%', '>80%'],
         titulo:"Conteo de unidades de uso no residencial"
         
+    },
+    hot_spot: {
+        rangos: [0,0, 0.85, 1, 1.36, 1056],
+        colores: ['#ffffff', '#c7c0e0', '#9383c0', '#62499e', '#2e0c7a'],
+        labels: ['0%', '0.85%', '1%', '1.36%', '>1.36%'],
+        titulo:"Diferencia porcentual del censo vs catastro"
     }
-
 
 
 

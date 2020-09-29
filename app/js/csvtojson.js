@@ -16,7 +16,7 @@ export function getZip(archivo) {
         .then(function(zip) {
             // you now have every files contained in the loaded zip
           
-          return zip.file("manzana.csv").async("string").then(function (data) { 
+          return zip.file(archivo+".csv").async("string").then(function (data) { 
     
             const parsedCsv = CSV.parse(data);
             datos_geo = parsedCsv;

@@ -10,6 +10,10 @@ const Leyenda=()=> {
     return (
       <div>
         <p id="titulo">Leyenda</p>
+        <p className="descripcion">{variables.hot_spot.titulo}  </p>
+            <div>
+                {variables.hot_spot.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.hot_spot.colores[e]}}></span><p>{i}</p></div>)}
+            </div>
             <p className="descripcion">{variables.col4.titulo}  </p>
             <div>
                 {variables.col4.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.col4.colores[e]}}></span><p>{i}</p></div>)}
