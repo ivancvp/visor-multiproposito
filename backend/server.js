@@ -63,6 +63,6 @@ app.get('/:layer/:x/:y/:z.pbf', function(req, res){
 
 
 
-app.listen(9000, function () {
+app.listen(3000, function () {
   console.log('Example app listening on port 9000!');
 });
