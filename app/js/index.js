@@ -908,10 +908,34 @@ const myFunction = (e) => {
   
   if (e.target.checked) {
     eval(e.target.name).setVisible(true)
+    document.getElementById(e.target.name).style.display = "block";
     elemento.style.width="280px"
+
+    if (e.target.name == "mz_uso_viv") {
+      sector_vivienda.setVisible(true)
+    }
+    else if (e.target.name == "mz_uso_mix") {
+      sector_mixto.setVisible(true)
+    }
+    else if (e.target.name == "mz_uso_res") {
+      sector_residencial.setVisible(true)
+    }
+
   } else {
     eval(e.target.name).setVisible(false)
+    document.getElementById(e.target.name).style.display = "none";
     elemento.style.width="0px"
+
+    if (e.target.name == "mz_uso_viv") {
+      sector_vivienda.setVisible(false)
+    }
+    else if (e.target.name == "mz_uso_mix") {
+      sector_mixto.setVisible(false)
+    }
+    else if (e.target.name == "mz_uso_res") {
+      sector_residencial.setVisible(false)
+    }
+
   }
 }
 
@@ -926,6 +950,17 @@ var slider = document.getElementsByClassName('slider');
 const changeSlider = (e) => {
   const transparencia=e.target.value/10
   eval(e.target.name).setOpacity(transparencia)
+  if (e.target.name == "mz_uso_viv") {
+    sector_vivienda.setOpacity(transparencia)
+  }
+  else if (e.target.name == "mz_uso_mix") {
+    sector_mixto.setOpacity(transparencia)
+  }
+  else if (e.target.name == "mz_uso_res") {
+    sector_residencial.setOpacity(transparencia)
+  }
+
+
 }
   for (var i = 0; i < slider.length; i++) {
     slider[i].addEventListener('change', e=>changeSlider(e), false);

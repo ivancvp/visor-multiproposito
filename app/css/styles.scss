@@ -304,16 +304,21 @@ input[type="checkbox"] + label::before {
   width: 15px;
   height: 15px;
   border-radius: 15px;
-  border: 2px solid $color1;
+  border: 2px solid $color-gris;
   background-color: #fff;
   display: block;
   content: "";
   float: left;
   margin-right: 5px;
+  
 }
 input[type="checkbox"]:checked+label::before {
-  box-shadow: inset 0px 0px 0px 3px #fff;
-  background-color: $color1;
+  
+  color: $color4;
+  content: '\2714';
+  top: -10px;
+  left: 5px;
+
 }
 
 #logo-presidente{
@@ -479,6 +484,9 @@ input[type="checkbox"]:checked+label::before {
   }
   .descripcion{
     margin:5px 0px;
+  }
+  .hidden{
+    display: none;
   }
 }
 

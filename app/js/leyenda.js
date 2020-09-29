@@ -10,25 +10,33 @@ const Leyenda=()=> {
     return (
       <div>
         <p id="titulo">Leyenda</p>
-        <p className="descripcion">{variables.hot_spot.titulo}  </p>
-            <div>
-                {variables.hot_spot.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.hot_spot.colores[e]}}></span><p>{i}</p></div>)}
+            <div id="dif_catastro_censo" >
+              <p className="descripcion">{variables.hot_spot.titulo}  </p>
+              <div>
+                  {variables.hot_spot.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.hot_spot.colores[e]}}></span><p>{i}</p></div>)}
+              </div>
             </div>
-            <p className="descripcion">{variables.col4.titulo}  </p>
-            <div>
-                {variables.col4.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.col4.colores[e]}}></span><p>{i}</p></div>)}
+            <div id="mz_uso_viv" className="hidden">
+              <p className="descripcion">{variables.col4.titulo}  </p>
+              <div>
+                  {variables.col4.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.col4.colores[e]}}></span><p>{i}</p></div>)}
+              </div>
             </div>
-            <p className="descripcion">
-                {variables.col5.titulo}  
-            </p>
-            <div>
-            {variables.col5.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.col5.colores[e]}}></span><p>{i}</p></div>)}
+            <div id="mz_uso_mix" className="hidden">
+              <p className="descripcion">
+                  {variables.col5.titulo}  
+              </p>
+              <div>
+              {variables.col5.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.col5.colores[e]}}></span><p>{i}</p></div>)}
+              </div>
             </div>
-            <p className="descripcion">
-                {variables.col6.titulo}  
-            </p>
-            <div>
-            {variables.col6.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.col6.colores[e]}}></span><p>{i}</p></div>)}
+            <div id="mz_uso_res" className="hidden">
+            	<p className="descripcion">
+            	    {variables.col6.titulo}  
+            	</p>
+            	<div>
+            	{variables.col6.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.col6.colores[e]}}></span><p>{i}</p></div>)}
+            	</div>
             </div>
       </div>
     );
