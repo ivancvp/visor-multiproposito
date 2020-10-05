@@ -30,7 +30,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
-    port: 3000,
+    port: 9000,
     hot:true,
     watchContentBase: true,
     disableHostCheck: true,

@@ -8,7 +8,7 @@ var expressStaticGzip = require("express-static-gzip");
 
 var path = require('path');
 
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors({credentials: true, origin: 'http://localhost:9000'}));
 
 
 app.get('/datos/:archivo', function (req, res) {
