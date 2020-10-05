@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const destino = "https://nowsoft.app/visor-multiproposito/";
 
-//const destino = "http://localhost:9000/";
+//const destino = "http://localhost:3000/";
 
 
 function servidorPost(uri,datos){
@@ -18,8 +18,15 @@ function servidorPost(uri,datos){
 }
 
 function servidorGet(uri) {
-        return axios.get(uri).then(resp => {
-        return(resp.data);
+    return axios.get(destino + uri, {
+        responseType: 'blob',
+        }).then(response => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', uri+'.zip'); //or any other extension
+            document.body.appendChild(link);
+            link.click();
     });
 }
 

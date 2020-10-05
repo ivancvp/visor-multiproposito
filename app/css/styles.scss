@@ -94,7 +94,7 @@ select{
   background-color: #fff;
 
 }
-input[type=text]{
+input[type=text],input[type=email]{
   width: 100%;
   font-family: 'Roboto', sans-serif;
   font-size: 1.2em;
@@ -156,15 +156,18 @@ p{
 #grupo-graficos{
   
   display:grid;
-  grid-template-columns: 1fr 1fr 1fr;
+
   overflow-y: scroll;
   .graph{
-    width: 280px;
+    width: 100%;
   }
 }
 
 .grupo{
   display:grid;
+  span{
+    color: $color4;
+  }
 }
 
 

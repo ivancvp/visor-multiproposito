@@ -4,15 +4,15 @@ import '../css/styles.scss';
 import './filtros'
 
 import 'ol/ol.css';
-import {Map, View} from 'ol';
+import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import OSM from 'ol/source/OSM';
 import XYZ from 'ol/source/XYZ';
-import {transform} from 'ol/proj';
-import {Style, Fill, Stroke} from 'ol/style';
-import {boundingExtent} from 'ol/extent';
-import {transformExtent} from 'ol/proj';
+import { transform } from 'ol/proj';
+import { Style, Fill, Stroke } from 'ol/style';
+import { boundingExtent } from 'ol/extent';
+import { transformExtent } from 'ol/proj';
 import Overlay from 'ol/Overlay';
 import MVT from 'ol/format/MVT';
 import VectorTileLayer from 'ol/layer/VectorTile';
@@ -21,20 +21,21 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import Cluster from 'ol/source/Cluster';
-import {Circle as CircleStyle, RegularShape, Text,Icon} from 'ol/style';
-import {defaults as defaultControls} from 'ol/control.js';
+import { Circle as CircleStyle, RegularShape, Text, Icon } from 'ol/style';
+import { defaults as defaultControls } from 'ol/control.js';
 
-import {get as getProjection} from 'ol/proj';
+import { get as getProjection } from 'ol/proj';
 
 
 
-import React,{Component} from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import geometria from '../json/bbox.json'
 
 import Leyenda from './leyenda.js'
+import {DescargaInfo} from './descarga.js'
 
-import { getZip} from './csvtojson'
+import { getZip } from './csvtojson'
 
 import variables from './variables'
 
@@ -43,27 +44,19 @@ import Load from './util'
 import servidor from './request'
 
 
-import {Barras,Dona} from '../modulos/graficos'
+import { Barras, Dona } from '../modulos/graficos'
 import { jsPDF } from "jspdf";
 
 
 
-var loading=ReactDOM.render(<Load visible={true} />, document.getElementById('loader'));
+var loading = ReactDOM.render(<Load visible={true} />, document.getElementById('loader'));
 
-ReactDOM.render(<Leyenda  />, document.getElementById('leyenda'));
+ReactDOM.render(<Leyenda />, document.getElementById('leyenda'));
 
-var donita= [0,0,0];
-var barrita = [0,0,0];
+ReactDOM.render(<DescargaInfo />, document.getElementById('descarga_datos'));
 
 
-barrita[0] = ReactDOM.render(<Barras titulo="Ejemplo de gráfico" series={variables.series} colors={variables.col4.colores} labels={variables.col4.labels}/>, document.getElementById('grafico'));
-barrita[1] =   ReactDOM.render(<Barras titulo="Ejemplo de gráfico" series={variables.series} colors={variables.col5.colores} labels={variables.col5.labels}/>, document.getElementById('grafico1'));
-barrita[2] =   ReactDOM.render(<Barras titulo="Ejemplo de gráfico" series={variables.series} colors={variables.col6.colores} labels={variables.col6.labels}/>, document.getElementById('grafico2'));
 
-donita[0] = ReactDOM.render(<Dona titulo="Ejemplo de gráfico" series={variables.series} colors={variables.col4.colores} labels={variables.col4.labels} />, document.getElementById('grafico3'));
-
-donita[1]=  ReactDOM.render(<Dona titulo="Ejemplo de gráfico"  series={variables.series} colors={variables.col5.colores} labels={variables.col5.labels}/>, document.getElementById('grafico4'));
-donita[2]=  ReactDOM.render(<Dona titulo="Ejemplo de gráfico" series={variables.series} colors={variables.col6.colores} labels={variables.col6.labels}/>, document.getElementById('grafico5'));
 
 function importAll(r) {
   let images = {};
@@ -74,52 +67,52 @@ function importAll(r) {
 const images = importAll(require.context('../img/', false, /\.(png|jpg|svg)$/));
 
 
-  var container = document.getElementById('popup');
-  var content = document.getElementById('popup-content');
-  var closer = document.getElementById('popup-closer');
-  
-  closer.onclick = function() {
-    overlay.setPosition(undefined);
-    closer.blur();
-    return false;
-  };
-  
-  var overlay = new Overlay({
-    element: container,
-    autoPan: true,
-    autoPanAnimation: {
-      duration: 250
-    }
-  });
+var container = document.getElementById('popup');
+var content = document.getElementById('popup-content');
+var closer = document.getElementById('popup-closer');
 
-var token = "pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw" 
-  
+closer.onclick = function () {
+  overlay.setPosition(undefined);
+  closer.blur();
+  return false;
+};
+
+var overlay = new Overlay({
+  element: container,
+  autoPan: true,
+  autoPanAnimation: {
+    duration: 250
+  }
+});
+
+var token = "pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw"
+
 var base = new TileLayer({
   source: new XYZ({
-    url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token='+token,
+    url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token=' + token,
     crossOrigin: "Anonymous"
   })
 });
-  const map = new Map({
-    target: 'mapa',
-    controls: [],
-    overlays: [overlay],
-    layers: [
-      base
-    ],
-    view: new View({
-      center: transform([-74.1083125,4.663437], 'EPSG:4326', 'EPSG:3857'),
-      zoom: 14
-    })
-  });
+const map = new Map({
+  target: 'mapa',
+  controls: [],
+  overlays: [overlay],
+  layers: [
+    base
+  ],
+  view: new View({
+    center: transform([-74.1083125, 4.663437], 'EPSG:4326', 'EPSG:3857'),
+    zoom: 14
+  })
+});
 
 
 
 
 
-var key="pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw"
+var key = "pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4dXAifQ.2k-OLO6Do2AoH5GLOWt-xw"
 
-  
+
 
 var resolutions = [];
 for (var i = 0; i <= 8; ++i) {
@@ -138,20 +131,10 @@ function tileUrlFunction(tileCoord) {
 }
 
 
-/*
-function tileUrlFunction_sector(tileCoord) {
-  return (
-    'https://geoportal.dane.gov.co/vector-tiles/capa/V2018_MGN_SECTORES/{z}/{x}/{y}.pbf'
-  )
-    .replace('{z}', String(tileCoord[0] * 2 - 1))
-    .replace('{x}', String(tileCoord[1]))
-    .replace('{y}', String(Math.pow(2, (tileCoord[0] * 2 - 1)) - tileCoord[2] - 1))
-}
-*/
 function tileUrlFunction_sector(tileCoord) {
 
   return (
-    servidor.getUrl()+'sector/{x}/{y}/{z}.pbf'
+    servidor.getUrl() + 'sector/{x}/{y}/{z}.pbf'
   )
     .replace('{z}', String(tileCoord[0] * 2 - 1))
     .replace('{x}', String(tileCoord[1]))
@@ -160,7 +143,7 @@ function tileUrlFunction_sector(tileCoord) {
 function tileUrlFunction_mpio(tileCoord) {
 
   return (
-    servidor.getUrl()+'mpio/{x}/{y}/{z}.pbf'
+    servidor.getUrl() + 'mpio/{x}/{y}/{z}.pbf'
   )
     .replace('{z}', String(tileCoord[0] * 2 - 1))
     .replace('{x}', String(tileCoord[1]))
@@ -169,7 +152,7 @@ function tileUrlFunction_mpio(tileCoord) {
 function tileUrlFunction_depto(tileCoord) {
 
   return (
-    servidor.getUrl()+'depto/{x}/{y}/{z}.pbf'
+    servidor.getUrl() + 'depto/{x}/{y}/{z}.pbf'
   )
     .replace('{z}', String(tileCoord[0] * 2 - 1))
     .replace('{x}', String(tileCoord[1]))
@@ -199,21 +182,21 @@ const sector_source = new VectorTileSource({
 
 const mz_uso_viv = new VectorTileLayer({
   source: mz_source,
-  zIndex:3
+  zIndex: 3
 });
 
 const mz_uso_mix = new VectorTileLayer({
   source: mz_source,
-  zIndex:2
+  zIndex: 2
 });
 const mz_uso_res = new VectorTileLayer({
   source: mz_source,
-  zIndex:1
+  zIndex: 1
 });
 
 const dif_catastro_censo = new VectorTileLayer({
   source: mz_source,
-  zIndex:4
+  zIndex: 4
 });
 
 
@@ -221,14 +204,14 @@ map.addLayer(mz_uso_res);
 mz_uso_res.set('id', 'mz_uso_res')
 mz_uso_res.setVisible(false)
 map.addLayer(mz_uso_mix);
-mz_uso_mix.set('id','mz_uso_mix')
+mz_uso_mix.set('id', 'mz_uso_mix')
 mz_uso_mix.setVisible(false)
 map.addLayer(mz_uso_viv);
-mz_uso_viv.set('id','mz_uso_viv')
+mz_uso_viv.set('id', 'mz_uso_viv')
 mz_uso_viv.setVisible(false)
 
 map.addLayer(dif_catastro_censo);
-dif_catastro_censo.set('id','dif_catastro_censo')
+dif_catastro_censo.set('id', 'dif_catastro_censo')
 
 
 
@@ -246,7 +229,7 @@ const mpio_source = new VectorTileSource({
 
 const mpio = new VectorTileLayer({
   source: mpio_source,
-  zIndex:10
+  zIndex: 10
 });
 
 map.addLayer(mpio);
@@ -265,7 +248,7 @@ const depto_source = new VectorTileSource({
 
 const depto = new VectorTileLayer({
   source: depto_source,
-  zIndex:15
+  zIndex: 15
 });
 
 map.addLayer(depto);
@@ -289,6 +272,9 @@ const sector_mixto = new VectorTileLayer({
 const sector_residencial = new VectorTileLayer({
   source: sector_source,
 });
+const sector_hot = new VectorTileLayer({
+  source: sector_source,
+});
 
 map.addLayer(sector_vivienda);
 sector_vivienda.set('id', 'sector_vivienda')
@@ -301,399 +287,184 @@ map.addLayer(sector_residencial);
 sector_residencial.set('id', 'sector_residencial')
 sector_residencial.setVisible(false)
 
+map.addLayer(sector_hot);
+sector_hot.set('id', 'sector_hot')
 
 
-const emptyLayerStyle = () => {
+
+
+mpio.setStyle(function (feature) {
+
   return new Style({
+    stroke: new Stroke({
+      color: '#015592',
+      width: 0.5,
+    }),
     fill: new Fill({
-      color:'rgba(255, 255, 255, 0)'
+      color: 'rgba(255, 255, 255, 0)'
     })
   });
+});
+
+depto.setStyle(function (feature) {
+
+  return new Style({
+    stroke: new Stroke({
+      color: '#349C00',
+      width: 1,
+    }),
+    fill: new Fill({
+      color: 'rgba(255, 255, 255, 0)'
+    })
+  });
+});
+
+
+
+var newdata_mz = []
+var newdata_sect = []
+var newdata_mz_hot = []
+var newdata_se_hot = []
+
+async function getDatos() {
+  newdata_mz = await getZip('manzana');
+  newdata_sect = await getZip('sector');
+  newdata_mz_hot = await getZip('hot_spot');
+  newdata_se_hot = await getZip('sector_dif_censal');
+
+  layerStyle();
+
 }
 
-mz_uso_viv.setStyle(function(feature) {
-  
-  emptyLayerStyle()
-  
-});
-mz_uso_mix.setStyle(function(feature) {
-  
-  emptyLayerStyle()
-  
-});
-mz_uso_res.setStyle(function(feature) {
-  
-  emptyLayerStyle()
-  
-});
-dif_catastro_censo.setStyle(function(feature) {
-  
-  emptyLayerStyle()
-  
-});
-
-  mpio.setStyle(function(feature) {
-
-    return new Style({
-      stroke: new Stroke({
-        color: '#015592',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: 'rgba(255, 255, 255, 0)'
-      })
-    });
-  });
-  depto.setStyle(function(feature) {
-
-    return new Style({
-      stroke: new Stroke({
-        color: '#349C00',
-        width: 1,
-      }),
-      fill: new Fill({
-        color: 'rgba(255, 255, 255, 0)'
-      })
-    });
-  });
-
-
-
-  var newdata_mz=[]
-  var newdata_sect = []
-  var newdata_mz_hot = []
-  
-  async function getDatos(){
-    newdata_mz = await getZip('manzana');
-    newdata_sect = await getZip('sector');
-    newdata_mz_hot = await getZip('hot_spot');
-    
-    layerStyle();
-
-}
-  
 getDatos()
 
 
 
 
-  const getColor = (valor,columna) => {
+const getColor = (valor, var_array, var_colores) => {
 
-    var array = []
-    var colores=[]
-    switch (columna){
-      case 4:
-        array= variables.col4.rangos;
-        colores = variables.col4.colores;
-        break;
-      case 5:
-        array = variables.col5.rangos;
-        colores = variables.col5.colores;
-      break;
-      case 6:
-        array = variables.col6.rangos;
-        colores = variables.col6.colores;
-        break;
-    }
+  var array = []
+  var colores = []
 
-    var filter = array.map((e,i) => {
-      return e < valor?i:false;
-    })
-  
-    return colores[Math.max(...filter)]
-    
-  }
-  const getColorHot = (valor,columna) => {
+  array = var_array;
+  colores = var_colores;
 
-    var array = []
-    var colores=[]
-    switch (columna){
-      case 4:
-        array= variables.hot_spot.rangos;
-        colores = variables.hot_spot.colores;
-        break;
-    }
+  var filter = array.map((e, i) => {
+    return e < valor ? i : false;
+  })
 
-    var filter = array.map((e,i) => {
-      return e < valor?i:false;
-    })
-  
-    return colores[Math.max(...filter)]
-    
-  }
+  return colores[Math.max(...filter)]
 
-  const iterador = (feature,columna) => {
-    const key = feature.get('cod_dane');
-
-    var color="#fff"
-    if(typeof newdata_mz[key] !== "undefined")
-    {
-      //console.log(newdata_mz[key])
-      
-        color=getColor(parseFloat(newdata_mz[key].row[columna]),columna)
-         
-    }
-    return color;
 }
-  
-  const iterador_sector = (feature,columna) => {
-    const key = feature.get('setr_ccnct');
-        
-    var color="#fff"
-    if(typeof newdata_sect[key] !== "undefined")
-    {
-      //console.log(newdata_mz[key])
-      
-        color=getColor(parseFloat(newdata_sect[key].row[columna]),columna)
-         
-    }
-    return color;
-}
-const iterador_hot_spot = (feature,columna) => {
-  const key = feature.get('cod_dane');
-  
-  var color="#fff"
-  if(typeof newdata_mz_hot[key] !== "undefined")
-  {
+
+
+const iterador = (info, feature, columna, pk, array, colores) => {
+
+  const key = feature.get(pk);
+
+  var color = 'transparent'
+  if (typeof info[key] !== "undefined") {
     //console.log(newdata_mz[key])
-    
-      color=getColorHot(parseFloat(newdata_mz_hot[key].row[columna]),columna)
-       
+
+    color = getColor(parseFloat(info[key].row[columna]), array, colores)
+
   }
   return color;
 }
 
-  const layerStyle = () => {
-    dif_catastro_censo.setStyle(function(feature) {
-  
-      var color = iterador_hot_spot(feature,4);
-        
-        //console.log(feature)
-        
-        return new Style({
-          fill: new Fill({
-            color: color
-          })
-        });
+
+
+
+const layerStyle = () => {
+
+
+  const estilo = (color) => {
+    return new Style({
+      fill: new Fill({
+        color: color
+      })
     });
-    
-    sector_vivienda.setStyle(function(feature) {
-  
-      var color = iterador_sector(feature,4);
-        
-        //console.log(feature)
-        
-        return new Style({
-          fill: new Fill({
-            color: color
-          })
-        });
-      });
-      sector_mixto.setStyle(function(feature) {
-  
-        var color = iterador_sector(feature,5);
-          
-          //console.log(feature)
-          
-          return new Style({
-            fill: new Fill({
-              color: color
-            })
-          });
-        });
-        sector_residencial.setStyle(function(feature) {
-  
-          var color = iterador_sector(feature,6);
-            
-            //console.log(feature)
-            
-            return new Style({
-              fill: new Fill({
-                color: color
-              })
-            });
-          });
-    
-    mz_uso_viv.setStyle(function(feature) {
-  
-    var color = iterador(feature,4);
-      
-      //console.log(feature)
-      
-      return new Style({
-        fill: new Fill({
-          color: color
-        })
-      });
-    });
-    mz_uso_mix.setStyle(function(feature) {
-  
-      var color = iterador(feature,5);
-        
-        return new Style({
-          fill: new Fill({
-            color: color
-          })
-        });
-      });
-      mz_uso_res.setStyle(function(feature) {
-  
-        var color = iterador(feature,6);
-          
-          return new Style({
-            fill: new Fill({
-              color: color
-            })
-          });
-        });
-        
-    ReactDOM.unmountComponentAtNode(document.getElementById('loader'))
-    mz_source.on('tileloadend', function () {
-      var extent = map.getView().calculateExtent(map.getSize());
-  
-
-      var elementos = mz_source.getFeaturesInExtent(extent);
-      
-      elementos = getUniqueFeatures(elementos, 'cod_dane');
-    
-      
-      
-      const getIndex = (data,col) => {
-        var valor=data.row[col]
-        return getEstadistica(valor,col)
-        
-      }
-    
-      var est1 = [0, 0, 0, 0, 0];
-      var est2 = [0, 0, 0, 0, 0];
-      var est3 = [0, 0, 0, 0, 0];
-    
-      if (elementos.length<5000) {
-    
-      elementos.forEach(function(feature) {
-         
-        var data = newdata_mz[feature.get("cod_dane")];
-        
-       
-          var i1=getIndex(data,4)
-          var i2=getIndex(data,5)
-          var i3=getIndex(data,6)
-      
-          est1[i1] = est1[i1] + 1
-          est2[i2] = est2[i2] + 1
-          est3[i3] = est3[i3] + 1
-       
-    
-    
-        
-      });
-      }
-    
-      if (mz_uso_viv.getProperties().visible) {
-        barrita[0].setState({ series: [{ data: est1 }] })
-        donita[0].setState({ series: est1 })
-    
-      }
-      if (mz_uso_mix.getProperties().visible) {
-        barrita[1].setState({ series: [{ data: est2 }] })
-        donita[1].setState({ series: est2 })
-    
-      }
-      if (mz_uso_res.getProperties().visible) {
-        barrita[2].setState({ series: [{ data: est3 }] })
-        donita[2].setState({ series: est3 })
-      }
-
-
-
-
-    });
-
-
   }
+
+  sector_hot.setStyle(function (feature) {
+
+    var color = iterador(newdata_se_hot, feature, 1, 'setr_ccnct', variables.hot_spot.rangos, variables.hot_spot.colores);
+
+    return estilo(color)
+  });
+
+  dif_catastro_censo.setStyle(function (feature) {
+
+    var color = iterador(newdata_mz_hot, feature, 4, 'cod_dane', variables.hot_spot.rangos, variables.hot_spot.colores);
+
+    return estilo(color)
+  });
+
+  sector_vivienda.setStyle(function (feature) {
+
+    var color = iterador(newdata_sect, feature, 4, 'setr_ccnct', variables.col4.rangos, variables.col4.colores);
+
+    return estilo(color)
+  });
+  sector_mixto.setStyle(function (feature) {
+
+    var color = iterador(newdata_sect, feature, 5, 'setr_ccnct', variables.col5.rangos, variables.col5.colores);
+
+    return estilo(color)
+  });
+  sector_residencial.setStyle(function (feature) {
+
+    var color = iterador(newdata_sect, feature, 6, 'setr_ccnct', variables.col6.rangos, variables.col6.colores);
+
+    return estilo(color)
+  });
+
+  mz_uso_viv.setStyle(function (feature) {
+
+    var color = iterador(newdata_mz, feature, 4, 'cod_dane', variables.col4.rangos, variables.col4.colores);
+
+    return estilo(color)
+  });
+  mz_uso_mix.setStyle(function (feature) {
+
+    var color = iterador(newdata_mz, feature, 5, 'cod_dane', variables.col5.rangos, variables.col5.colores);
+
+    return estilo(color)
+  });
+  mz_uso_res.setStyle(function (feature) {
+
+    var color = iterador(newdata_mz, feature, 6, 'cod_dane', variables.col6.rangos, variables.col6.colores);
+
+    return estilo(color)
+  });
+
+
+  ReactDOM.unmountComponentAtNode(document.getElementById('loader'))
+
+  mz_source.on('tileloadend', function () {
+    
+
+
+  });
+
+
+}
 
 
 
 
 // zoom to municipio 
-  const sel_municipio = document.querySelector('#municipio');
-  sel_municipio.addEventListener('change', (event) => {
+const sel_municipio = document.querySelector('#municipio');
+sel_municipio.addEventListener('change', (event) => {
 
-    var value = sel_municipio.value;
+  var value = sel_municipio.value;
 
-    var boundary=geometria[value]
+  var boundary = geometria[value]
 
-       var ext = boundingExtent([[boundary[0][0],boundary[0][1]],[boundary[1][0],boundary[1][1]]]);
-      ext = transformExtent(ext, 'EPSG:4326', 'EPSG:3857');
+  var ext = boundingExtent([[boundary[0][0], boundary[0][1]], [boundary[1][0], boundary[1][1]]]);
+  ext = transformExtent(ext, 'EPSG:4326', 'EPSG:3857');
 
-    map.getView().fit(ext, map.getSize());
-     
-
-    mz_source.on('tileloadend', function () {
-      var extent = map.getView().calculateExtent(map.getSize());
-  
-
-      var elementos = mz_source.getFeaturesInExtent(extent);
-      
-      elementos = getUniqueFeatures(elementos, 'cod_dane');
-    
-      
-      
-      const getIndex = (data,col) => {
-        var valor=data.row[col]
-        return getEstadistica(valor,col)
-        
-      }
-    
-      var est1 = [0, 0, 0, 0, 0];
-      var est2 = [0, 0, 0, 0, 0];
-      var est3 = [0, 0, 0, 0, 0];
-    
-      if (elementos.length<5000) {
-    
-      elementos.forEach(function(feature) {
-         
-        var data = newdata_mz[feature.get("cod_dane")];
-        
-       
-          var i1=getIndex(data,4)
-          var i2=getIndex(data,5)
-          var i3=getIndex(data,6)
-      
-          est1[i1] = est1[i1] + 1
-          est2[i2] = est2[i2] + 1
-          est3[i3] = est3[i3] + 1
-       
-    
-    
-        
-      });
-      }
-    
-      if (mz_uso_viv.getProperties().visible) {
-        barrita[0].setState({ series: [{ data: est1 }] })
-        donita[0].setState({ series: est1 })
-    
-      }
-      if (mz_uso_mix.getProperties().visible) {
-        barrita[1].setState({ series: [{ data: est2 }] })
-        donita[1].setState({ series: est2 })
-    
-      }
-      if (mz_uso_res.getProperties().visible) {
-        barrita[2].setState({ series: [{ data: est3 }] })
-        donita[2].setState({ series: est3 })
-      }
-
-
-
-
-    });
-
-
-
-
-
+  map.getView().fit(ext, map.getSize());
 
 
 });
@@ -703,64 +474,72 @@ const iterador_hot_spot = (feature,columna) => {
 
 
 // Popup al hacer click sobre una capa
-map.on('singleclick', function(evt) {
+map.on('singleclick', function (evt) {
   var coordinate = evt.coordinate;
 
   var mensaje = "";
   var id = "";
 
-  var feature=map.forEachFeatureAtPixel(evt.pixel, function(feature,layer) { 
+  var feature = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
     id = layer.get('id')
     return feature;
-    
+
   }, {
     hitTolerance: 2
   });
-console.log(id)
+  console.log(id)
 
   if (id == "mz_uso_viv") {
-    var info=newdata_mz[feature.get("cod_dane")].row
-    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[1]+"</p><p>% : "+info[4]+"</p>"
-  }else if (id == "mz_uso_mix") {
-    var info=newdata_mz[feature.get("cod_dane")].row
-    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[2]+"</p><p>% : "+info[5]+"</p>"
-  }else if (id == "mz_uso_res") {
-    var info=newdata_mz[feature.get("cod_dane")].row
-    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[3]+"</p><p>% : "+info[6]+"</p>"
+    var info = newdata_mz[feature.get("cod_dane")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Conteo: " + info[1] + "</p><p>% : " + info[4] + "</p>"
+  } else if (id == "mz_uso_mix") {
+    var info = newdata_mz[feature.get("cod_dane")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Conteo: " + info[2] + "</p><p>% : " + info[5] + "</p>"
+  } else if (id == "mz_uso_res") {
+    var info = newdata_mz[feature.get("cod_dane")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Conteo: " + info[3] + "</p><p>% : " + info[6] + "</p>"
   }
   else if (id == "dif_catastro_censo") {
-    var info=newdata_mz_hot[feature.get("cod_dane")].row
-    mensaje="<p>Cod DANE: "+info[0]+"</p><p>diferencia %: "+info[4]+"</p>"
+    var info = newdata_mz_hot[feature.get("cod_dane")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>diferencia %: " + info[4] + "</p>"
   }
   else if (id == "sector_vivienda") {
-    var info=newdata_sect[feature.get("setr_ccnct")].row
-    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[1]+"</p><p>% : "+info[4]+"</p>"
+    var info = newdata_sect[feature.get("setr_ccnct")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Conteo: " + info[1] + "</p><p>% : " + info[4] + "</p>"
   }
   else if (id == "sector_mixto") {
-    var info=newdata_sect[feature.get("setr_ccnct")].row
-    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[2]+"</p><p>% : "+info[5]+"</p>"
+    var info = newdata_sect[feature.get("setr_ccnct")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Conteo: " + info[2] + "</p><p>% : " + info[5] + "</p>"
   }
   else if (id == "sector_residencial") {
-    var info=newdata_sect[feature.get("setr_ccnct")].row
-    mensaje="<p>Cod DANE: "+info[0]+"</p><p>Conteo: "+info[3]+"</p><p>% : "+info[6]+"</p>"
+    var info = newdata_sect[feature.get("setr_ccnct")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Conteo: " + info[3] + "</p><p>% : " + info[6] + "</p>"
   }
-  else if (id == "mpio") {
-    var info=feature.get("nombre_mpio")
-    var info1=feature.get("nombre_depto")
-
-    mensaje="<p>Municipio: "+info+"</p>"+"<p>Depto: "+info1+"</p>"
-  }else if (id == "depto") {
-    var info=feature.get("nombre")
-    mensaje="<p>Depto: "+info+"</p>"
-  }
-
-
-
-  if (mensaje!="") {
-    content.innerHTML = '<p>'+mensaje+'</p>';
-    overlay.setPosition(coordinate);
+  else if (id == "sector_hot") {
+    var info = newdata_se_hot[feature.get("setr_ccnct")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>diferencia %: " + info[1] + "</p>"
   }
   
+
+
+
+  else if (id == "mpio") {
+    var info = feature.get("nombre_mpio")
+    var info1 = feature.get("nombre_depto")
+
+    mensaje = "<p>Municipio: " + info + "</p>" + "<p>Depto: " + info1 + "</p>"
+  } else if (id == "depto") {
+    var info = feature.get("nombre")
+    mensaje = "<p>Depto: " + info + "</p>"
+  }
+
+
+
+  if (mensaje != "") {
+    content.innerHTML = '<p>' + mensaje + '</p>';
+    overlay.setPosition(coordinate);
+  }
+
 
 });
 
@@ -824,12 +603,12 @@ exportButton.addEventListener(
         'JPEG',
         5,
         5,
-        dim[0]-10,
-        dim[1]-10
+        dim[0] - 10,
+        dim[1] - 10
       );
       pdf.setFillColor(255, 255, 255);
-      pdf.setDrawColor(0,0,0);
-      pdf.setTextColor(0,0,0)
+      pdf.setDrawColor(0, 0, 0);
+      pdf.setTextColor(0, 0, 0)
       pdf.rect(18, 10, 80, 50, 'FD');
       pdf.text(20, 15, 'Concentraciones espaciales');
       pdf.setFontSize(15);
@@ -871,27 +650,27 @@ exportButton.addEventListener(
 var radios = document.querySelectorAll('input[type=radio][name=radio]');
 radios.forEach(radio => radio.addEventListener('change', () => {
   const mapa = radio.value;
-  if (mapa=="gris") {
+  if (mapa == "gris") {
     base.setSource(
       new XYZ({
-        url: 'https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/256/{z}/{x}/{y}?access_token='+token,
+        url: 'https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/256/{z}/{x}/{y}?access_token=' + token,
         crossOrigin: "Anonymous"
       })
-    ) 
+    )
   } else if (mapa == "dark") {
     base.setSource(
       new XYZ({
-        url: 'https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token='+token,
+        url: 'https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token=' + token,
         crossOrigin: "Anonymous"
       })
-    ) 
+    )
   } else {
     base.setSource(
       new XYZ({
-        url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token='+token,
+        url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token=' + token,
         crossOrigin: "Anonymous"
       })
-    ) 
+    )
   }
 
 }
@@ -904,12 +683,8 @@ var check_depto = document.getElementsByClassName('layer');
 
 const myFunction = (e) => {
 
-  var elemento = document.querySelector('.graph[name="'+e.target.name+'"]')
-  
   if (e.target.checked) {
     eval(e.target.name).setVisible(true)
-    document.getElementById(e.target.name).style.display = "block";
-    elemento.style.width="280px"
 
     if (e.target.name == "mz_uso_viv") {
       sector_vivienda.setVisible(true)
@@ -919,12 +694,13 @@ const myFunction = (e) => {
     }
     else if (e.target.name == "mz_uso_res") {
       sector_residencial.setVisible(true)
+    }else if (e.target.name == "dif_catastro_censo") {
+      sector_hot.setVisible(true)
     }
 
   } else {
     eval(e.target.name).setVisible(false)
     document.getElementById(e.target.name).style.display = "none";
-    elemento.style.width="0px"
 
     if (e.target.name == "mz_uso_viv") {
       sector_vivienda.setVisible(false)
@@ -934,13 +710,15 @@ const myFunction = (e) => {
     }
     else if (e.target.name == "mz_uso_res") {
       sector_residencial.setVisible(false)
+    }else if (e.target.name == "dif_catastro_censo") {
+      sector_hot.setVisible(false)
     }
 
   }
 }
 
 for (var i = 0; i < check_depto.length; i++) {
-  check_depto[i].addEventListener('change', e=>myFunction(e), false);
+  check_depto[i].addEventListener('change', e => myFunction(e), false);
 }
 
 
@@ -948,7 +726,7 @@ for (var i = 0; i < check_depto.length; i++) {
 var slider = document.getElementsByClassName('slider');
 
 const changeSlider = (e) => {
-  const transparencia=e.target.value/10
+  const transparencia = e.target.value / 10
   eval(e.target.name).setOpacity(transparencia)
   if (e.target.name == "mz_uso_viv") {
     sector_vivienda.setOpacity(transparencia)
@@ -958,165 +736,174 @@ const changeSlider = (e) => {
   }
   else if (e.target.name == "mz_uso_res") {
     sector_residencial.setOpacity(transparencia)
+  }else if (e.target.name == "dif_catastro_censo") {
+    sector_hot.setOpacity(transparencia)
   }
 
 
 }
-  for (var i = 0; i < slider.length; i++) {
-    slider[i].addEventListener('change', e=>changeSlider(e), false);
+for (var i = 0; i < slider.length; i++) {
+  slider[i].addEventListener('change', e => changeSlider(e), false);
 }
-  
+
 
 
 // actualización de las estadisticas
 
 
-const getEstadistica = (valor,columna) => {
+const getEstadistica = (valor, rangos) => {
 
   var array = []
 
-  switch (columna){
-    case 4:
-      array= variables.col4.rangos;
-      break;
-    case 5:
-      array = variables.col5.rangos;
-    break;
-    case 6:
-      array = variables.col6.rangos;
-      break;
-  }
+  array = rangos
 
-  var filter = array.map((e,i) => {
-    return e < valor?i:false;
+  var filter = array.map((e, i) => {
+    return e < valor ? i : false;
   })
 
   return Math.max(...filter)
-  
+
 }
 
+var reporte_opcion = document.getElementById('reporte_capa')
+var grafico = document.getElementById('grupo-graficos')
 
-var grafico=document.getElementById('grupo-graficos')
+var info_graph = null;
+
+reporte_opcion.addEventListener('change', (event) => {
+  
+  console.log(event.target.value)
+
+  if (event.target.value !== "") {
+    var data = variables[variables[event.target.value]]
+  
+    info_graph = data;
+  
+    map.on('moveend', onMoveEnd);
+
+    var center = map.getView().getCenter();
+    var resolution = map.getView().getResolution();
+    map.getView().setCenter([center[0] + 10*resolution, center[1] + 10*resolution]);
+  
+  } else {
+    map.un('moveend', onMoveEnd);
+    grafico.style.display = "none";
+  }
+
+
+})
+
+
+
+
 function onMoveEnd(evt) {
+  
   evt.stopPropagation();
   evt.preventDefault();
 
+  var info = info_graph;
+
   if (evt.map.getView().getZoom() > 12) {
-    
-  
-
-  var map = evt.map;
-  var extent = map.getView().calculateExtent(map.getSize());
-  
-
-  var elementos = mz_source.getFeaturesInExtent(extent);
-  
-  elementos = getUniqueFeatures(elementos, 'cod_dane');
-
-  
-  
-  const getIndex = (data,col) => {
-    var valor=data.row[col]
-    return getEstadistica(valor,col)
-    
-  }
-
-  var est1 = [0, 0, 0, 0, 0];
-  var est2 = [0, 0, 0, 0, 0];
-  var est3 = [0, 0, 0, 0, 0];
-
-  if (elementos.length<10000) {
-    grafico.style.height = "500px";
-  elementos.forEach(function(feature) {
-     
-    var data = newdata_mz[feature.get("cod_dane")];
-    
-   
-      var i1=getIndex(data,4)
-      var i2=getIndex(data,5)
-      var i3=getIndex(data,6)
-  
-      est1[i1] = est1[i1] + 1
-      est2[i2] = est2[i2] + 1
-      est3[i3] = est3[i3] + 1
-   
 
 
-    
-  });
-  }
 
-  if (mz_uso_viv.getProperties().visible) {
-    barrita[0].setState({ series: [{ data: est1 }] })
-    donita[0].setState({ series: est1 })
+    var map = evt.map;
+    var extent = map.getView().calculateExtent(map.getSize());
 
-  }
-  if (mz_uso_mix.getProperties().visible) {
-    barrita[1].setState({ series: [{ data: est2 }] })
-    donita[1].setState({ series: est2 })
 
-  }
-  if (mz_uso_res.getProperties().visible) {
-    barrita[2].setState({ series: [{ data: est3 }] })
-    donita[2].setState({ series: est3 })
-  }
+    var elementos = mz_source.getFeaturesInExtent(extent);
+
+    elementos = getUniqueFeatures(elementos, 'cod_dane');
+
+
+    var est1 = [0, 0, 0, 0, 0];
+
+
+    if (elementos.length < 50000 && elementos.length >0 ) {
+
+      grafico.style.display = "block";
+
+      elementos.forEach(function (feature) {
+
+        var data = newdata_mz[feature.get("cod_dane")];
+
+        var a = data.row[info.columna]
+
+        var i1 = getEstadistica(a, info.rangos);
+
+        est1[i1] = est1[i1] + 1
+
+
+      });
+
+      var donita = null;
+      var barrita = null;
+          
+      barrita= ReactDOM.render(<Barras titulo={info.titulo} series={variables.series} colors={info.colores} labels={info.labels} />, document.getElementById('grafico'));
+      
+      donita = ReactDOM.render(<Dona titulo="Ejemplo de gráfico" series={variables.series} colors={info.colores} labels={info.labels} />, document.getElementById('grafico3'));
+      
+      barrita.setState({ series: [{ data: est1 }],options:{colors:info.colores,xaxis:{categories:info.labels}}})
+
+      donita.setState({ series: est1,options:{colors:info.colores,labels:info.labels} })
+
+    } else {
+      grafico.style.display = "none";
+
+    }
+
+
+
+
   } else {
-    grafico.style.height = "0px";
+    grafico.style.display = "none";
+
   }
-  
+
 }
 
-map.on('moveend', onMoveEnd);
+
+
+
 
 function getUniqueFeatures(array, comparatorProperty) {
   var existingFeatureKeys = {};
-  var uniqueFeatures = array.filter(function(el) {
-    
-  if (existingFeatureKeys[el.get(comparatorProperty)]) {
-  return false;
-  } else {
-  existingFeatureKeys[el.get(comparatorProperty)] = true;
-  return true;
-  }
+  var uniqueFeatures = array.filter(function (el) {
+
+    if (existingFeatureKeys[el.get(comparatorProperty)]) {
+      return false;
+    } else {
+      existingFeatureKeys[el.get(comparatorProperty)] = true;
+      return true;
+    }
   });
-   
+
   return uniqueFeatures;
-  }
+}
 
 
 
 const mq = window.matchMedia("(max-width: 700px)");
-  
-  if (mq.matches) {
-    document.getElementById('ham').checked = false;
+
+if (mq.matches) {
+  document.getElementById('ham').checked = false;
 
 
-    var ham = document.getElementById('ham');
-ham.addEventListener('change', e => {
-  
-  if (ham.checked) {
-    document.getElementById('leyenda').style.visibility = "hidden";
-  } else {
-    document.getElementById('leyenda').style.visibility = "visible";
-    
-  }
+  var ham = document.getElementById('ham');
+  ham.addEventListener('change', e => {
 
-}
+    if (ham.checked) {
+      document.getElementById('leyenda').style.visibility = "hidden";
+    } else {
+      document.getElementById('leyenda').style.visibility = "visible";
 
-, false);
-
-
-  } else {
-    document.getElementById('ham').checked = true;
-  }
-/*
-  var currZoom = map.getView().getZoom();
-
-  map.on('moveend', function(e) {
-    var newZoom = map.getView().getZoom();
-    if (currZoom != newZoom) {
-      console.log('zoom end, new zoom: ' + newZoom);
-      currZoom = newZoom;
     }
-  });
-*/
+
+  }
+
+    , false);
+
+
+} else {
+  document.getElementById('ham').checked = true;
+}

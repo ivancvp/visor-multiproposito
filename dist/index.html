@@ -112,8 +112,8 @@
           
                 <div class="grupo-capas">
                   <label>
-                    <input type="checkbox" value="value" class="layer" id="check10" name="dif_catastro_censo" checked>
-                    <label for="check10"></label>
+                    <input type="checkbox" value="value" class="layer" id="check4" name="dif_catastro_censo" checked>
+                    <label for="check4"></label>
                     <span>Diferencias Censo - Catastro</span>
                     <input type="range" class="slider" min="1" max="10" step="1" value="10" name="dif_catastro_censo">
                   </label>
@@ -149,7 +149,16 @@
           
                 </div>
                 <p class="titulo_seccion">Reportes</p>
-        
+
+                <p>Seleccione la capa</p>
+                <select id="reporte_capa">
+                  <option value="">Seleccione...</option>
+                  <option value="dif_catastro_censo">Diferencias Censo - Catastro</option>
+                  <option value="mz_uso_viv">Conteo unidades uso de vivienda</option>
+                  <option value="mz_uso_mix">Conteo unidades uso mixto</option>
+                  <option value="mz_uso_res">Conteo unidades uso No residencial</option>
+                </select>
+
                 <div id="grupo-graficos">
         
                   <div class="graph" name="mz_uso_viv">
@@ -157,15 +166,6 @@
                     <div id="grafico3" ></div>
                   </div>
         
-                  <div class="graph" name="mz_uso_mix">
-                    <div id="grafico1" ></div>
-                    <div id="grafico4" ></div>
-                  </div>
-        
-                  <div class="graph" name="mz_uso_res">
-                    <div id="grafico2" ></div>
-                    <div id="grafico5" ></div>
-                  </div>
         
                 </div>
           
@@ -200,21 +200,7 @@
                 </div>
           
           
-                <p class="titulo_seccion">Descarga de datos</p>
-          
-                <div class="grupo">
-                  <label>Nivel</label>
-                  <select id="nivel">
-                    <option value="nacional">Nacional</option>
-                  </select>
-                  <label>Datos</label>
-                  <select id="nivel">
-                    <option value="1">Estado catastro</option>
-                  </select>
-                  <label>Correo</label>
-                  <input type="text">
-                  <button type="button" id="descarga-info">Descargar</button>
-                </div>
+                <div id="descarga_datos"></div>
         
                 <img id="logo-presidente" src="./img/logo-presidencia.svg" alt="">
         
