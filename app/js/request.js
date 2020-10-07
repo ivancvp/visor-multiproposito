@@ -5,7 +5,6 @@ const destino = "https://nowsoft.app/visor-multiproposito/";
 
 //const destino = "http://localhost:3000/";
 
-
 function servidorPost(uri,datos){
 
     return axios({
