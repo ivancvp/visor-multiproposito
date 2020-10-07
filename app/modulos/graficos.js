@@ -22,7 +22,7 @@ class Barras extends Component {
           chart: {
                 id: 'apexchart-example',
                 toolbar: {
-                    show: true
+                    show: false
                   },
           },
           xaxis: {
@@ -31,14 +31,25 @@ class Barras extends Component {
             legend: {
               show:false
           },
-
-            plotOptions: {
-                bar: {
-                distributed: true,
-                    dataLabels: {
-                      position: 'top'
-                  },
-                }
+          title: {
+            text: this.props.titulo,
+            align: 'left'
+          },
+          yaxis: {
+            title: {
+              text: 'Número de manzanas',
+              rotate: -90,
+              offsetX: 0,
+              offsetY: 0
+          },
+          },
+          plotOptions: {
+              bar: {
+              distributed: true,
+                  dataLabels: {
+                    position: 'top'
+                },
+              }
         },
         dataLabels: {
           enabled: true,

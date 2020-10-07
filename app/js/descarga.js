@@ -43,7 +43,7 @@ export const DescargaInfo = () => {
                     <label>Correo</label>
                     <input type="email" name="correo" ref={register({ required: true })} />
                     {errors.correo && <span>Obligatorio!</span>}
-                    <button type="submit" id="descarga-info">Descargar</button>
+                    <button type="submit" className="btn-large" >Descargar</button>
                 </div>
             </form>
         </div>

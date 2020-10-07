@@ -440,6 +440,7 @@ const layerStyle = () => {
 
 
   ReactDOM.unmountComponentAtNode(document.getElementById('loader'))
+  document.getElementById('background').style.display="none"
 
   mz_source.on('tileloadend', function () {
     
@@ -487,7 +488,7 @@ map.on('singleclick', function (evt) {
   }, {
     hitTolerance: 2
   });
-  console.log(id)
+ 
 
   if (id == "mz_uso_viv") {
     var info = newdata_mz[feature.get("cod_dane")].row
@@ -597,35 +598,48 @@ exportButton.addEventListener(
           }
         }
       );
+
+
       var pdf = new jsPDF('landscape', undefined, format);
       pdf.addImage(
         mapCanvas.toDataURL('image/jpeg'),
         'JPEG',
         5,
-        5,
+        20,
         dim[0] - 10,
-        dim[1] - 10
+        dim[1] - 30
       );
+
       pdf.setFillColor(255, 255, 255);
       pdf.setDrawColor(0, 0, 0);
       pdf.setTextColor(0, 0, 0)
-      pdf.rect(18, 10, 80, 50, 'FD');
-      pdf.text(20, 15, 'Concentraciones espaciales');
-      pdf.setFontSize(15);
-      pdf.text(20, 22, 'Diferencias CNPV - Catastro');
 
-      pdf.setFillColor(232, 97, 79);
+      pdf.rect(5, 20, 30, 60, 'F');
 
-      pdf.rect(20, 30, 5, 5, 'F');
-      pdf.setFillColor(79, 111, 232);
-      pdf.rect(20, 40, 5, 5, 'F');
-      pdf.setFillColor(208, 208, 208);
-      pdf.rect(20, 50, 5, 5, 'F');
 
+      var radio = document.querySelector('input[name="radio"]:checked').getAttribute("layer");
+
+      var data=variables[variables[radio]]
+
+   
+      
+      pdf.setFontSize(14);
+      pdf.text(5, 15, data.titulo);
+
+      pdf.text(5, 25, "Leyenda");
       pdf.setFontSize(12);
-      pdf.text(30, 35, 'Altas diferencias encontradas');
-      pdf.text(30, 45, 'Bajas diferencias encontradas');
-      pdf.text(30, 55, 'Comportamiento aleatorio');
+      var j = 30;
+
+      for (i = 0; i < data.colores.length; i++){
+        
+        pdf.setFillColor(data.colores[i]);
+
+        pdf.rect(5, j, 5, 5, 'F');
+        pdf.text(15, j+5, data.labels[i]);
+
+        j = j + 10;
+      }
+
 
       pdf.save('map.pdf');
       // Reset original map size
@@ -647,7 +661,7 @@ exportButton.addEventListener(
 
 
 // cambio del mapa base
-var radios = document.querySelectorAll('input[type=radio][name=radio]');
+var radios = document.querySelectorAll('input[type=radio][name=radio1]');
 radios.forEach(radio => radio.addEventListener('change', () => {
   const mapa = radio.value;
   if (mapa == "gris") {
@@ -678,43 +692,89 @@ radios.forEach(radio => radio.addEventListener('change', () => {
 ))
 
 
+var grafico = document.getElementById('grupo-graficos')
+
+var info_graph = null;
+
+
+var data = variables[variables["dif_catastro_censo"]]
+  
+info_graph = data;
+
+map.on('moveend', onMoveEnd);
+
 //visibilidad de las capas de los layer
 var check_depto = document.getElementsByClassName('layer');
 
+var prev_layer = "dif_catastro_censo";
+
 const myFunction = (e) => {
 
-  if (e.target.checked) {
-    eval(e.target.name).setVisible(true)
+  const check = ["depto", "mpio"]
 
-    if (e.target.name == "mz_uso_viv") {
+
+ var layer=e.target.getAttribute("layer");
+
+  if (e.target.checked && check.indexOf(layer)<0) {
+    
+    eval(prev_layer).setVisible(false)
+    
+    document.getElementById(prev_layer).style.display = "none";
+
+    sector_vivienda.setVisible(false)
+    sector_mixto.setVisible(false)
+    sector_residencial.setVisible(false)
+    sector_hot.setVisible(false)
+
+    prev_layer = layer;
+
+    eval(layer).setVisible(true)
+    document.getElementById(prev_layer).style.display = "block";
+
+
+    if (layer == "mz_uso_viv") {
       sector_vivienda.setVisible(true)
     }
-    else if (e.target.name == "mz_uso_mix") {
+    else if (layer == "mz_uso_mix") {
       sector_mixto.setVisible(true)
     }
-    else if (e.target.name == "mz_uso_res") {
+    else if (layer== "mz_uso_res") {
       sector_residencial.setVisible(true)
-    }else if (e.target.name == "dif_catastro_censo") {
+    }else if (layer == "dif_catastro_censo") {
       sector_hot.setVisible(true)
     }
 
-  } else {
-    eval(e.target.name).setVisible(false)
-    document.getElementById(e.target.name).style.display = "none";
+    //seccion de graficos
+    
 
-    if (e.target.name == "mz_uso_viv") {
-      sector_vivienda.setVisible(false)
-    }
-    else if (e.target.name == "mz_uso_mix") {
-      sector_mixto.setVisible(false)
-    }
-    else if (e.target.name == "mz_uso_res") {
-      sector_residencial.setVisible(false)
-    }else if (e.target.name == "dif_catastro_censo") {
-      sector_hot.setVisible(false)
-    }
+    var data = variables[variables[layer]]
+  
+    info_graph = data;
+  
+    map.on('moveend', onMoveEnd);
 
+    var center = map.getView().getCenter();
+    var resolution = map.getView().getResolution();
+    map.getView().setCenter([center[0] + 10*resolution, center[1] + 10*resolution]);
+  
+
+
+
+
+
+
+
+  } else  {
+    if (e.target.checked) {
+      eval(layer).setVisible(true)
+    } else {
+      eval(layer).setVisible(false)
+    }
+    
   }
+
+
+
 }
 
 for (var i = 0; i < check_depto.length; i++) {
@@ -765,33 +825,7 @@ const getEstadistica = (valor, rangos) => {
 
 }
 
-var reporte_opcion = document.getElementById('reporte_capa')
-var grafico = document.getElementById('grupo-graficos')
 
-var info_graph = null;
-
-reporte_opcion.addEventListener('change', (event) => {
-  
-  console.log(event.target.value)
-
-  if (event.target.value !== "") {
-    var data = variables[variables[event.target.value]]
-  
-    info_graph = data;
-  
-    map.on('moveend', onMoveEnd);
-
-    var center = map.getView().getCenter();
-    var resolution = map.getView().getResolution();
-    map.getView().setCenter([center[0] + 10*resolution, center[1] + 10*resolution]);
-  
-  } else {
-    map.un('moveend', onMoveEnd);
-    grafico.style.display = "none";
-  }
-
-
-})
 
 
 
@@ -818,15 +852,23 @@ function onMoveEnd(evt) {
 
     var est1 = [0, 0, 0, 0, 0];
 
+    var radio = document.querySelector('input[name="radio"]:checked').getAttribute("layer");
+    var array_datos;
+    if (radio=="dif_catastro_censo") {
+      array_datos=newdata_mz_hot
+    } else {
+      array_datos=newdata_mz
+    }
 
     if (elementos.length < 50000 && elementos.length >0 ) {
 
       grafico.style.display = "block";
 
+
       elementos.forEach(function (feature) {
 
-        var data = newdata_mz[feature.get("cod_dane")];
-
+        var data = array_datos[feature.get("cod_dane")];
+        
         var a = data.row[info.columna]
 
         var i1 = getEstadistica(a, info.rangos);
@@ -843,7 +885,7 @@ function onMoveEnd(evt) {
       
       donita = ReactDOM.render(<Dona titulo="Ejemplo de gráfico" series={variables.series} colors={info.colores} labels={info.labels} />, document.getElementById('grafico3'));
       
-      barrita.setState({ series: [{ data: est1 }],options:{colors:info.colores,xaxis:{categories:info.labels}}})
+      barrita.setState({ series: [{ data: est1 }],options:{colors:info.colores,xaxis:{categories:info.labels},title:{text:info.titulo}}})
 
       donita.setState({ series: est1,options:{colors:info.colores,labels:info.labels} })
 
@@ -907,3 +949,14 @@ if (mq.matches) {
 } else {
   document.getElementById('ham').checked = true;
 }
+
+
+var buttons = document.querySelectorAll(".toggle-button");
+var modal = document.querySelector("#modal");
+
+
+[].forEach.call(buttons, function(button) {
+  button.addEventListener("click", function() {
+    modal.classList.toggle("off");
+  })
+});
