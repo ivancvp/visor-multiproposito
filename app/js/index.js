@@ -102,7 +102,7 @@ const map = new Map({
   ],
   view: new View({
     center: transform([-74.1083125, 4.663437], 'EPSG:4326', 'EPSG:3857'),
-    zoom: 14
+    zoom: 18
   })
 });
 
@@ -131,6 +131,16 @@ function tileUrlFunction(tileCoord) {
 }
 
 
+function tileUrlFunction_seccion(tileCoord) {
+
+  return (
+    servidor.getUrl() + 'seccion/{x}/{y}/{z}.pbf'
+  )
+    .replace('{z}', String(tileCoord[0] * 2 - 1))
+    .replace('{x}', String(tileCoord[1]))
+    .replace('{y}', String(tileCoord[2]))
+}
+
 function tileUrlFunction_sector(tileCoord) {
 
   return (
@@ -140,6 +150,8 @@ function tileUrlFunction_sector(tileCoord) {
     .replace('{x}', String(tileCoord[1]))
     .replace('{y}', String(tileCoord[2]))
 }
+
+
 function tileUrlFunction_mpio(tileCoord) {
 
   return (
@@ -180,6 +192,18 @@ const sector_source = new VectorTileSource({
   tileUrlFunction: tileUrlFunction_sector,
 });
 
+
+const seccion_source = new VectorTileSource({
+  format: new MVT(),
+  tileGrid: new TileGrid({
+    extent: getProjection('EPSG:900913').getExtent(),
+    resolutions: resolutions,
+    tileSize: 512,
+  }),
+  tileUrlFunction: tileUrlFunction_seccion,
+});
+
+
 const mz_uso_viv = new VectorTileLayer({
   source: mz_source,
   zIndex: 3
@@ -194,9 +218,20 @@ const mz_uso_res = new VectorTileLayer({
   zIndex: 1
 });
 
+
 const dif_catastro_censo = new VectorTileLayer({
   source: mz_source,
   zIndex: 4
+});
+
+
+const razon_unidades_seccion = new VectorTileLayer({
+  source: seccion_source,
+  zIndex: 5
+});
+const razon_unidades_manzana = new VectorTileLayer({
+  source: mz_source,
+  zIndex: 1
 });
 
 
@@ -212,9 +247,13 @@ mz_uso_viv.setVisible(false)
 
 map.addLayer(dif_catastro_censo);
 dif_catastro_censo.set('id', 'dif_catastro_censo')
+dif_catastro_censo.setVisible(false)
 
+map.addLayer(razon_unidades_seccion);
+razon_unidades_seccion.set('id', 'razon_unidades_seccion')
 
-
+map.addLayer(razon_unidades_manzana);
+razon_unidades_manzana.set('id', 'razon_unidades_manzana')
 
 const mpio_source = new VectorTileSource({
   format: new MVT(),
@@ -289,7 +328,7 @@ sector_residencial.setVisible(false)
 
 map.addLayer(sector_hot);
 sector_hot.set('id', 'sector_hot')
-
+sector_hot.setVisible(false)
 
 
 
@@ -325,6 +364,8 @@ var newdata_mz = []
 var newdata_sect = []
 var newdata_mz_hot = []
 var newdata_se_hot = []
+var newdata_razon_unidades_seccion = []
+var newdata_razon_unidades_manzana = []
 
 async function getDatos() {
   newdata_mz = await getZip('manzana');
@@ -332,6 +373,9 @@ async function getDatos() {
   newdata_mz_hot = await getZip('hot_spot');
   newdata_se_hot = await getZip('sector_dif_censal');
 
+  newdata_razon_unidades_seccion=await getZip('razon_unidades_seccion');
+  newdata_razon_unidades_manzana = await getZip('razon_unidades_manzana');
+  
   layerStyle();
 
 }
@@ -348,6 +392,7 @@ const getColor = (valor, var_array, var_colores) => {
 
   array = var_array;
   colores = var_colores;
+
 
   var filter = array.map((e, i) => {
     return e < valor ? i : false;
@@ -379,11 +424,29 @@ const layerStyle = () => {
 
 
   const estilo = (color) => {
-    return new Style({
-      fill: new Fill({
-        color: color
-      })
-    });
+
+
+
+    if (color!=='transparent') {
+      return new Style({
+        fill: new Fill({
+          color: color
+        }),
+        stroke: new Stroke({
+          color: '#535353',
+          width: 0.3,
+        }),
+      });
+    } else {
+      return new Style({
+        fill: new Fill({
+          color: color
+        })
+      });
+    }
+    
+
+
   }
 
   sector_hot.setStyle(function (feature) {
@@ -437,6 +500,27 @@ const layerStyle = () => {
 
     return estilo(color)
   });
+
+
+  razon_unidades_seccion.setStyle(function (feature) {
+
+    var color = iterador(newdata_razon_unidades_seccion, feature, 5, 'secr_ccnct', variables.razon_unidades.rangos, variables.razon_unidades.colores);
+
+    return estilo(color)
+  });
+
+  razon_unidades_manzana.setStyle(function (feature) {
+
+    var color = iterador(newdata_razon_unidades_manzana, feature, 6, 'cod_dane', variables.razon_unidades.rangos, variables.razon_unidades.colores);
+
+    return estilo(color)
+  });
+
+
+
+
+
+
 
 
   ReactDOM.unmountComponentAtNode(document.getElementById('loader'))
@@ -520,8 +604,22 @@ map.on('singleclick', function (evt) {
     var info = newdata_se_hot[feature.get("setr_ccnct")].row
     mensaje = "<p>Cod DANE: " + info[0] + "</p><p>diferencia %: " + info[1] + "</p>"
   }
-  
+  else if (id == "razon_unidades_seccion") {
+    var info = newdata_razon_unidades_seccion[feature.get("secr_ccnct")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Categoría: " + info[5] + "</p>"+
+    "</p><p>Lotes: " + info[1] + "</p>"+
+    "</p><p>Predios: " + info[2] + "</p>"+
+    "</p><p>Unidades censales: " + info[3] + "</p>"
+  }
+  else if (id == "razon_unidades_manzana") {
+    var info = newdata_razon_unidades_manzana[feature.get("cod_dane")].row
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Categoría: " + info[6] + "</p>"+
+    "</p><p>Lotes: " + info[2] + "</p>"+
+    "</p><p>Predios: " + info[3] + "</p>"+
+    "</p><p>Unidades censales: " + info[4] + "</p>"+
+    "</p><p>Total de viviendas: " + info[1] + "</p>"
 
+  }
 
 
   else if (id == "mpio") {
@@ -697,7 +795,7 @@ var grafico = document.getElementById('grupo-graficos')
 var info_graph = null;
 
 
-var data = variables[variables["dif_catastro_censo"]]
+var data = variables['razon_unidades']
   
 info_graph = data;
 
@@ -706,7 +804,7 @@ map.on('moveend', onMoveEnd);
 //visibilidad de las capas de los layer
 var check_depto = document.getElementsByClassName('layer');
 
-var prev_layer = "dif_catastro_censo";
+var prev_layer = "razon_unidades_seccion";
 
 const myFunction = (e) => {
 
@@ -725,6 +823,10 @@ const myFunction = (e) => {
     sector_mixto.setVisible(false)
     sector_residencial.setVisible(false)
     sector_hot.setVisible(false)
+    dif_catastro_censo.setVisible(false)
+    razon_unidades_seccion.setVisible(false)
+    razon_unidades_manzana.setVisible(false)
+
 
     prev_layer = layer;
 
@@ -742,14 +844,20 @@ const myFunction = (e) => {
       sector_residencial.setVisible(true)
     }else if (layer == "dif_catastro_censo") {
       sector_hot.setVisible(true)
+    }else if (layer == "razon_unidades_seccion") {
+      razon_unidades_manzana.setVisible(true)
     }
 
     //seccion de graficos
     
+    console.log(layer)
 
     var data = variables[variables[layer]]
   
     info_graph = data;
+
+    console.log(data)
+
   
     map.on('moveend', onMoveEnd);
 
@@ -798,6 +906,8 @@ const changeSlider = (e) => {
     sector_residencial.setOpacity(transparencia)
   }else if (e.target.name == "dif_catastro_censo") {
     sector_hot.setOpacity(transparencia)
+  }else if (e.target.name == "razon_unidades_seccion") {
+    razon_unidades_manzana.setOpacity(transparencia)
   }
 
 
@@ -850,12 +960,17 @@ function onMoveEnd(evt) {
     elementos = getUniqueFeatures(elementos, 'cod_dane');
 
 
-    var est1 = [0, 0, 0, 0, 0];
+    var est1 = new Array(info.rangos.length-1).fill(0);
+
 
     var radio = document.querySelector('input[name="radio"]:checked').getAttribute("layer");
     var array_datos;
+
     if (radio=="dif_catastro_censo") {
       array_datos=newdata_mz_hot
+    } else if (radio=="razon_unidades_seccion") {
+      array_datos=newdata_razon_unidades_manzana
+
     } else {
       array_datos=newdata_mz
     }
@@ -865,22 +980,46 @@ function onMoveEnd(evt) {
       grafico.style.display = "block";
 
 
+
       elementos.forEach(function (feature) {
 
-        var data = array_datos[feature.get("cod_dane")];
-        
-        var a = data.row[info.columna]
+        try {
+          
+          var data = array_datos[feature.get("cod_dane")];
 
-        var i1 = getEstadistica(a, info.rangos);
+          var a = data.row[info.columna]
+
+          var i1 = getEstadistica(a, info.rangos);
 
         est1[i1] = est1[i1] + 1
+        }
+        catch (err) {
+          
+        }
+        
 
 
       });
 
+      
+
       var donita = null;
       var barrita = null;
           
+/*
+      console.log(info.titulo)
+      console.log(variables.series)
+      console.log(info.colores)
+      console.log(info.labels)
+
+      
+      variables.series=[0,0,0,0,0,0,0],
+      est1=[0,0,0,16,0,0,0]
+      info.colores= ['#25318E', '#6872C6', '#C0C3D6', '#FFF', '#E1AE4E','#E1814E','#E14E4E']
+      info.labels=['<20%', '20-50%', '50-75%', '75-90%', '>90%','s','l']
+      info.titulo="Diferencia porcentual del censo vs catastrohkjhj"
+      */
+
       barrita= ReactDOM.render(<Barras titulo={info.titulo} series={variables.series} colors={info.colores} labels={info.labels} />, document.getElementById('grafico'));
       
       donita = ReactDOM.render(<Dona titulo="Ejemplo de gráfico" series={variables.series} colors={info.colores} labels={info.labels} />, document.getElementById('grafico3'));

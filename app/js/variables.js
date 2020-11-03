@@ -4,7 +4,8 @@ export default {
     dif_catastro_censo:'hot_spot',
     mz_uso_viv: 'col4',
     mz_uso_mix: 'col5',
-    mz_uso_res:'col6',
+    mz_uso_res: 'col6',
+    razon_unidades_seccion:'razon_unidades',
     
     series:[0,0,0,0,0],
     col4: {
@@ -36,6 +37,13 @@ export default {
         labels: ['0%', '0.85%', '1%', '1.36%', '>1.36%'],
         titulo: "Diferencia porcentual del censo vs catastro",
         columna:4
+    },
+    razon_unidades: {
+        rangos: [-4,-3,-2, -1, 0, 1, 2,3],
+        colores: ['#25318E', '#6872C6', '#C0C3D6', '#FFF', '#E1AE4E','#E1814E','#E14E4E'],
+        labels: ['Baja 99%', 'Baja 95%', 'Baja 90%', 'No significativo', 'Alta 90%','Alta 95%','Alta 99%'],
+        titulo: "Razón Unidades Censales por predio",
+        columna:6
     }
 
 

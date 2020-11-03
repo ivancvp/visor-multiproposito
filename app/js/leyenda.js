@@ -10,7 +10,13 @@ const Leyenda=()=> {
     return (
       <div>
         <p id="titulo">Leyenda</p>
-            <div id="dif_catastro_censo" >
+            <div id="razon_unidades_seccion" >
+              <p className="descripcion">{variables.razon_unidades.titulo}  </p>
+              <div>
+                  {variables.razon_unidades.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.razon_unidades.colores[e]}}></span><p>{i}</p></div>)}
+              </div>
+            </div>
+            <div id="dif_catastro_censo" className="hidden">
               <p className="descripcion">{variables.hot_spot.titulo}  </p>
               <div>
                   {variables.hot_spot.labels.map((i, e) => <div className="item" ><span style={{backgroundColor:variables.hot_spot.colores[e]}}></span><p>{i}</p></div>)}

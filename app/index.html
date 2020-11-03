@@ -111,8 +111,17 @@
                 <p class="titulo_seccion">Capas</p>
           
                 <div class="grupo-capas">
+
                   <label>
-                    <input type="radio" value="value" class="layer" id="check4"  layer="dif_catastro_censo" name="radio" checked>
+                    <input type="radio" value="value" class="layer" id="check7"  layer="razon_unidades_seccion" name="radio" checked>
+                    <label for="check7"></label>
+                    <span>Razón Unidades Censales por predio</span>
+                    <input type="range" class="slider" min="1" max="10" step="1" value="10" name="razon_unidades_seccion">
+                  </label>
+
+
+                  <label>
+                    <input type="radio" value="value" class="layer" id="check4"  layer="dif_catastro_censo" name="radio" >
                     <label for="check4"></label>
                     <span>Diferencias Censo - Catastro</span>
                     <input type="range" class="slider" min="1" max="10" step="1" value="10" name="dif_catastro_censo">
