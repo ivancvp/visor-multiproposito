@@ -58,13 +58,7 @@ ReactDOM.render(<DescargaInfo />, document.getElementById('descarga_datos'));
 
 
 
-function importAll(r) {
-  let images = {};
-  r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
-  return images;
-}
 
-const images = importAll(require.context('../img/', false, /\.(png|jpg|svg)$/));
 
 
 var container = document.getElementById('popup');
@@ -171,6 +165,29 @@ function tileUrlFunction_depto(tileCoord) {
     .replace('{y}', String(tileCoord[2]))
 }
 
+function tileUrlFunction_toponimia(tileCoord) {
+
+  return (
+    servidor.getUrl() + 'mvt/{x}/{y}/{z}.pbf'
+  )
+    .replace('{z}', String(tileCoord[0] * 2 - 1))
+    .replace('{x}', String(tileCoord[1]))
+    .replace('{y}', String(tileCoord[2]))
+}
+
+var start = 'LA ISLA';
+var stop = 'NEIVA';
+
+function tileUrlFunction_ruta(tileCoord) {
+
+  return (
+    servidor.getUrl() + 'ruta/'+start+'/'+stop+'/'+'{x}/{y}/{z}.pbf'
+  )
+    .replace('{z}', String(tileCoord[0] * 2 - 1))
+    .replace('{x}', String(tileCoord[1]))
+    .replace('{y}', String(tileCoord[2]))
+}
+
 const mz_source = new VectorTileSource({
   format: new MVT(),
   tileGrid: new TileGrid({
@@ -204,6 +221,22 @@ const seccion_source = new VectorTileSource({
 });
 
 
+const topo_source = new VectorTileSource({
+  format: new MVT(),
+  tileGrid: new TileGrid({
+    extent: getProjection('EPSG:900913').getExtent(),
+    resolutions: resolutions,
+    tileSize: 512,
+  }),
+  tileUrlFunction: tileUrlFunction_toponimia,
+});
+
+const ruta_source = new VectorTileSource({
+  format: new MVT(),
+  url:servidor.getUrl() + 'ruta/'+start+'/'+stop+'/'+'{x}/{y}/{z}.pbf'
+});
+
+
 const mz_uso_viv = new VectorTileLayer({
   source: mz_source,
   zIndex: 3
@@ -233,6 +266,46 @@ const razon_unidades_manzana = new VectorTileLayer({
   source: mz_source,
   zIndex: 1
 });
+
+const topo = new VectorTileLayer({
+  source: topo_source,
+  zIndex: 10,
+  minZoom: 15,
+  maxZoom: 18,
+  
+});
+
+map.addLayer(topo);
+topo.set('id', 'topo')
+
+const ruta_optima = new VectorTileLayer({
+  source: ruta_source,
+  zIndex: 100,
+  style:new Style({
+    stroke: new Stroke({
+      color: 'red',
+      lineDash: [4],
+      width: 3
+    })
+  })
+});
+
+map.addLayer(ruta_optima);
+ruta_optima.set('id', 'ruta_optima')
+
+/*
+topo.setStyle(function (feature) {
+
+  return new Style({
+    image: new Icon({
+      //crossOrigin: 'anonymous',
+      src: './img/icons/'+feature.get("cod")+'.png',
+      scale: 0.4,
+    }),
+  })
+});
+*/
+
 
 
 map.addLayer(mz_uso_res);
@@ -1099,3 +1172,15 @@ var modal = document.querySelector("#modal");
     modal.classList.toggle("off");
   })
 });
+
+
+const btn_ruta = document.getElementById('calcular-ruta');
+const input_start = document.getElementById('start')
+const input_stop=document.getElementById('stop')
+
+btn_ruta.addEventListener('click',e => {
+  start = input_start.value;
+  stop = input_stop.value;
+
+  ruta_optima.getSource().setUrl(servidor.getUrl() + 'ruta/'+start+'/'+stop+'/'+'{x}/{y}/{z}.pbf'); 
+})

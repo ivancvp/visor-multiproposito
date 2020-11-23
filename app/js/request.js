@@ -1,9 +1,9 @@
 const axios = require('axios');
 
 
-const destino = "https://nowsoft.app/visor-multiproposito/";
+//const destino = "https://nowsoft.app/visor-multiproposito/";
 
-//const destino = "http://localhost:3000/";
+const destino = "http://localhost:3000/";
 
 function servidorPost(uri,datos){
 
