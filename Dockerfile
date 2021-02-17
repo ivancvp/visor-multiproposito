@@ -1,13 +1,8 @@
 FROM node:12
 
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
 RUN npm install pm2 -g
 
-COPY . .
+COPY dist dist
+COPY backend backend
 
-CMD ["pm2-runtime", "backend/server.js"]
+CMD ["pm2-runtime", "backend/server.bundle.js","--json"]

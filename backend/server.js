@@ -15,12 +15,26 @@ app.use(cors({credentials: true, origin: 'http://localhost:9000'}));
 
 
 const pool = new Pool({
+  host: "pg-docker",
+  port: 5432,
+  user: "docker",
+  database: "vector-tiles",
+  password: 'docker'
+})
+
+
+/*
+const pool = new Pool({
   host: "localhost",
   port: 5432,
   user: "postgres",
   database: "vector-tiles",
   password: '123456'
 })
+*/
+
+
+
 const mercator = new SphericalMercator()
 
 
@@ -33,6 +47,7 @@ app.get("/mvt/:x/:y/:z.pbf", function(req, res) {
   FROM (
       SELECT
       cod,
+      descripcion,
           ST_AsMVTGeom(
               geom,
               TileBBox(${req.params.z}, ${req.params.x}, ${req.params.y}, 3857),
@@ -47,8 +62,9 @@ app.get("/mvt/:x/:y/:z.pbf", function(req, res) {
   const values = [bbox[0], bbox[1], bbox[2], bbox[3], 4326]
   pool.query(sql, values , function(err, mvt) {
           if (err) {
-              console.log(err)
-              response.status(400)
+              
+            res.status(400)
+            throw err
           } else {
             //console.log(mvt.rows[0].st_asmvt)
               res.setHeader('Access-Control-Allow-Origin', '*');
@@ -82,13 +98,13 @@ app.get("/ruta/:start/:stop/:x/:y/:z.pbf", function(req, res) {
       from 
       vias_p_vertices_pgr v,
       poblacion p 
-      where p.nombre='${req.params.start}' and ST_Intersects(v.the_geom,st_buffer(p.geom,5000))
+      where p.cod_pob='${req.params.start}' and ST_Intersects(v.the_geom,st_buffer(p.geom,5000))
       order by st_distance(v.the_geom,p.geom) limit 1),
         (select v.id as id
       from 
       vias_p_vertices_pgr v,
       poblacion p 
-      where p.nombre='${req.params.stop}' and ST_Intersects(v.the_geom,st_buffer(p.geom,5000))
+      where p.cod_pob='${req.params.stop}' and ST_Intersects(v.the_geom,st_buffer(p.geom,5000))
       order by st_distance(v.the_geom,p.geom) limit 1),
         false
       ) p
@@ -101,7 +117,9 @@ app.get("/ruta/:start/:stop/:x/:y/:z.pbf", function(req, res) {
   pool.query(sql, values , function(err, mvt) {
           if (err) {
               console.log(err)
-              response.status(400)
+            res.status(400)
+            
+            throw err
           } else {
             //console.log(mvt.rows[0].st_asmvt)
               res.setHeader('Access-Control-Allow-Origin', '*');
@@ -111,6 +129,56 @@ app.get("/ruta/:start/:stop/:x/:y/:z.pbf", function(req, res) {
           }
   })
 })
+
+
+app.get('/c_pob', function (req, res) {
+  
+  var sql = `select jsonb_agg(json_build_object('value',cod_pob,'label',nombre)) as data from poblacion`;
+
+  pool.query(sql, (error, results) => {
+    if (error) {
+      console.log(error)
+      res.status(200).json("error")
+      throw error
+    }
+        
+    res.status(200).json(results.rows[0].data)
+   
+  });
+
+
+});
+
+
+app.get('/bbox/:start/:stop', function (req, res) {
+  
+  var sql = `select 
+  (select ST_X(ST_Transform(geom,4326)) as c1 
+  from poblacion where cod_pob='${req.params.start}')
+  ,(select ST_Y(ST_Transform(geom,4326)) as c2
+  from poblacion where cod_pob='${req.params.start}')
+  ,(select ST_X(ST_Transform(geom,4326)) as c3
+  from poblacion where cod_pob='${req.params.stop}')
+  ,(select ST_Y(ST_Transform(geom,4326)) as c4
+  from poblacion where cod_pob='${req.params.stop}')`;
+
+
+
+  pool.query(sql,  (error, results) => {
+    if (error) {
+      console.log(error)
+      res.status(200).json("error")
+      throw error
+    }
+        
+    res.status(200).json(results.rows)
+   
+  });
+
+
+})
+
+
 
 
 

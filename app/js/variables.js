@@ -39,11 +39,11 @@ export default {
         columna:4
     },
     razon_unidades: {
-        rangos: [-4,-3,-2, -1, 0, 1, 2,3],
-        colores: ['#25318E', '#6872C6', '#C0C3D6', '#FFF', '#E1AE4E','#E1814E','#E14E4E'],
-        labels: ['Baja 99%', 'Baja 95%', 'Baja 90%', 'No significativo', 'Alta 90%','Alta 95%','Alta 99%'],
+        rangos: [-10000,1, 1.5, 2, 3,100000],
+        colores: ['#F3CE7E', '#F3B876', '#F39676', '#F57465', '#C64B4B'],
+        labels: ['Menor a 1', '1.1 a 1.5', '1.6 a 2', '2.1 a 3', 'Mayor a 3'],
         titulo: "Razón Unidades Censales por predio",
-        columna:6
+        columna:5
     }
 
 

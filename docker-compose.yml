@@ -1,5 +1,9 @@
 version: "2"
 
+networks:
+    db-net:
+      external:
+        name: db-net
 
 services:
 
@@ -19,3 +23,5 @@ services:
     build: .
     ports:
         - "3004:3000"
+    networks:
+        - db-net

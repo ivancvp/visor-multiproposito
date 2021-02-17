@@ -10,7 +10,7 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 import OSM from 'ol/source/OSM';
 import XYZ from 'ol/source/XYZ';
 import { transform } from 'ol/proj';
-import { Style, Fill, Stroke } from 'ol/style';
+import { Style, Fill, Stroke} from 'ol/style';
 import { boundingExtent } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
 import Overlay from 'ol/Overlay';
@@ -33,6 +33,8 @@ import ReactDOM from 'react-dom';
 import geometria from '../json/bbox.json'
 
 import Leyenda from './leyenda.js'
+import Ruta from './ruta_optima.js'
+
 import {DescargaInfo} from './descarga.js'
 
 import { getZip } from './csvtojson'
@@ -55,6 +57,168 @@ ReactDOM.render(<Leyenda />, document.getElementById('leyenda'));
 
 ReactDOM.render(<DescargaInfo />, document.getElementById('descarga_datos'));
 
+
+
+var imagenes = ['010108',
+'010109',
+'010125',
+'010201',
+'010202',
+'010203',
+'010204',
+'010205',
+'010206',
+'010207',
+'010208',
+'010209',
+'010210',
+'010211',
+'010212',
+'010213',
+'010214',
+'010215',
+'010216',
+'010217',
+'010218',
+'010219',
+'010220',
+'010221',
+'010222',
+'010301',
+'010302',
+'010303',
+'010401',
+'010402',
+'010403',
+'010404',
+'010405',
+'010501',
+'010502',
+'010503',
+'010504',
+'010505',
+'010506',
+'010507',
+'020101',
+'020102',
+'020103',
+'020104',
+'020105',
+'020106',
+'020107',
+'020108',
+'020109',
+'020110',
+'020111',
+'020112',
+'020113',
+'020114',
+'020115',
+'020116',
+'020117',
+'020118',
+'020119',
+'020120',
+'020121',
+'020122',
+'020123',
+'020124',
+'020125',
+'020126',
+'020127',
+'020130',
+'020201',
+'020202',
+'020203',
+'020204',
+'020205',
+'020301',
+'020302',
+'020303',
+'020304',
+'020401',
+'020402',
+'020403',
+'020404',
+'020405',
+'020406',
+'020407',
+'020408',
+'020501',
+'020502',
+'020601',
+'020602',
+'020603',
+'020604',
+'020605',
+'020607',
+'020608',
+'020609',
+'020610',
+'020701',
+'020702',
+'020703',
+'020704',
+'020705',
+'020706',
+'020707',
+'020708',
+'020709',
+'020710',
+'020711',
+'020712',
+'020713',
+'020801',
+'020802',
+'020803',
+'020804',
+'020805',
+'020806',
+'020807',
+'020810',
+'020901',
+'020902',
+'020903',
+'020904',
+'020905',
+'020906',
+'021001',
+'021003',
+'021004',
+'021006',
+'021008',
+'021009',
+'021010',
+'021011',
+'021012',
+'021101',
+'021102',
+'021103',
+'021104',
+'021105',
+'021106',
+'021201',
+'021202',
+'021203',
+'021204',
+'021205',
+'021301',
+'021302',
+'021304',
+'021401',
+'021402',
+'021403',
+'021404',
+'021501',
+'021502',
+'021503',
+'021504',
+'021505',
+'030101',
+'030102',
+'030103',
+'0030104a'
+];
 
 
 
@@ -83,7 +247,7 @@ var token = "pk.eyJ1IjoiaXZhbjEyMzQ1Njc4IiwiYSI6ImNqc2ZkOTNtMjA0emgzeXQ3N2ppMng4
 
 var base = new TileLayer({
   source: new XYZ({
-    url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token=' + token,
+    url: 'https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token=' + token,
     crossOrigin: "Anonymous"
   })
 });
@@ -96,7 +260,7 @@ const map = new Map({
   ],
   view: new View({
     center: transform([-74.1083125, 4.663437], 'EPSG:4326', 'EPSG:3857'),
-    zoom: 18
+    zoom: 12
   })
 });
 
@@ -273,6 +437,16 @@ const topo = new VectorTileLayer({
   minZoom: 15,
   maxZoom: 18,
   
+
+  style: new Style({
+    image: new CircleStyle({
+      radius: 5,
+      fill: new Fill({color: '#666666'}),
+      stroke: new Stroke({color: '#bada55', width: 1}),
+    })
+  }),
+
+
 });
 
 map.addLayer(topo);
@@ -293,18 +467,53 @@ const ruta_optima = new VectorTileLayer({
 map.addLayer(ruta_optima);
 ruta_optima.set('id', 'ruta_optima')
 
-/*
+ReactDOM.render(<Ruta ruta={ruta_optima} map={map}/>, document.getElementById('ruta'));
+
+var iconos= new Array();
+for (i = 0; i < imagenes.length; i++) {
+  
+  var imagen =  new Icon( ({
+    size: [40, 40],
+    scale: 0.5,
+    anchor: [0.5, 20],
+    anchorXUnits: 'fraction',
+    anchorYUnits: 'pixels',
+    src: './img/icons/'+imagenes[i]+'.png'
+  }))
+  
+  
+  iconos.push(imagen)
+
+}
+
+
+
+
+
 topo.setStyle(function (feature) {
 
+  var cod = feature.get("cod");
+  
+  var indice=imagenes.indexOf(cod)
+  
   return new Style({
-    image: new Icon({
-      //crossOrigin: 'anonymous',
-      src: './img/icons/'+feature.get("cod")+'.png',
-      scale: 0.4,
-    }),
+    image: iconos[indice],
+    text: new Text({
+      text: feature.get("descripcion"),
+      offsetY: 15,
+      font: "12px Calibri,sans-serif",
+      stroke: new Stroke({
+        color: '#ffff',
+        width: 3,
+      }),
+    })
   })
-});
-*/
+
+
+})
+
+
+
 
 
 
@@ -446,8 +655,8 @@ async function getDatos() {
   newdata_mz_hot = await getZip('hot_spot');
   newdata_se_hot = await getZip('sector_dif_censal');
 
-  newdata_razon_unidades_seccion=await getZip('razon_unidades_seccion');
-  newdata_razon_unidades_manzana = await getZip('razon_unidades_manzana');
+  newdata_razon_unidades_seccion=await getZip('razon_unidades_seccion1');
+  newdata_razon_unidades_manzana = await getZip('razon_unidades_manzana1');
   
   layerStyle();
 
@@ -577,14 +786,14 @@ const layerStyle = () => {
 
   razon_unidades_seccion.setStyle(function (feature) {
 
-    var color = iterador(newdata_razon_unidades_seccion, feature, 5, 'secr_ccnct', variables.razon_unidades.rangos, variables.razon_unidades.colores);
+    var color = iterador(newdata_razon_unidades_seccion, feature, 4, 'secr_ccnct', variables.razon_unidades.rangos, variables.razon_unidades.colores);
 
     return estilo(color)
   });
 
   razon_unidades_manzana.setStyle(function (feature) {
 
-    var color = iterador(newdata_razon_unidades_manzana, feature, 6, 'cod_dane', variables.razon_unidades.rangos, variables.razon_unidades.colores);
+    var color = iterador(newdata_razon_unidades_manzana, feature, 5, 'cod_dane', variables.razon_unidades.rangos, variables.razon_unidades.colores);
 
     return estilo(color)
   });
@@ -679,19 +888,22 @@ map.on('singleclick', function (evt) {
   }
   else if (id == "razon_unidades_seccion") {
     var info = newdata_razon_unidades_seccion[feature.get("secr_ccnct")].row
-    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Categoría: " + info[5] + "</p>"+
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Razón: " + info[4] + "</p>"+
     "</p><p>Lotes: " + info[1] + "</p>"+
     "</p><p>Predios: " + info[2] + "</p>"+
     "</p><p>Unidades censales: " + info[3] + "</p>"
   }
   else if (id == "razon_unidades_manzana") {
     var info = newdata_razon_unidades_manzana[feature.get("cod_dane")].row
-    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Categoría: " + info[6] + "</p>"+
+    mensaje = "<p>Cod DANE: " + info[0] + "</p><p>Razón: " + info[5] + "</p>"+
     "</p><p>Lotes: " + info[2] + "</p>"+
     "</p><p>Predios: " + info[3] + "</p>"+
     "</p><p>Unidades censales: " + info[4] + "</p>"+
     "</p><p>Total de viviendas: " + info[1] + "</p>"
 
+  } else if (id == "topo") {
+    
+    mensaje = `<p>Cód: ${feature.get("cod")}</p><p>Descripción: ${feature.get("descripcion")}</p>`
   }
 
 
@@ -1173,14 +1385,3 @@ var modal = document.querySelector("#modal");
   })
 });
 
-
-const btn_ruta = document.getElementById('calcular-ruta');
-const input_start = document.getElementById('start')
-const input_stop=document.getElementById('stop')
-
-btn_ruta.addEventListener('click',e => {
-  start = input_start.value;
-  stop = input_stop.value;
-
-  ruta_optima.getSource().setUrl(servidor.getUrl() + 'ruta/'+start+'/'+stop+'/'+'{x}/{y}/{z}.pbf'); 
-})

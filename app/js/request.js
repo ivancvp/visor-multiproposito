@@ -1,9 +1,9 @@
 const axios = require('axios');
 
 
-//const destino = "https://nowsoft.app/visor-multiproposito/";
+const destino = "https://visores.dane.gov.co/geovisor-catastro/";
 
-const destino = "http://localhost:3000/";
+//const destino = "http://localhost:3000/";
 
 function servidorPost(uri,datos){
 
@@ -50,7 +50,13 @@ function getData(uri) {
     
 }
 
+ function peticionGet(uri){
+    return axios.get(destino+uri).then(resp => {
+    return(resp.data);
+});
+}
 
+exports.peticionGet = peticionGet;
 exports.getUrl=()=> { return destino };
 exports.servidorPost=servidorPost;
 exports.servidorGet = servidorGet;
